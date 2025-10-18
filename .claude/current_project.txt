@@ -1,0 +1,8 @@
+# Current Active Project
+
+CURRENT_PROJECT=xeena-village-manager
+
+# Available Projects:
+# - xeena-village-manager (in progress)
+# - xeenaa-fabric-enhancements (in progress)
+# - xeenaa-soulbound (not started)

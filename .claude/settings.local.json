@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:spark.lucko.me)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:modrinth.com)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(gradle --version)",
+      "Bash(gradle build:*)",
+      "Bash(gradle:*)",
+      "Read(//c/Users/canya/.gradle/**)",
+      "Bash(echo $GRADLE_USER_HOME)",
+      "Bash(find:*)",
+      "Read(//c/Gradle/**)",
+      "Bash(./gradlew test:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Read(//c/Users/canya/Documents/projects/Minecraft/**)",
+      "Bash(./gradlew:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

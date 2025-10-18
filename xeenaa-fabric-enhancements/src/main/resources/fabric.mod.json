@@ -1,0 +1,43 @@
+{
+    "schemaVersion": 1,
+    "id": "xeenaa-fabric-enhancements",
+    "version": "${version}",
+    "name": "Xeenaa Fabric Enhancements",
+    "description": "Performance optimizations for Minecraft world and chunk management with comprehensive performance monitoring",
+    "authors": [
+        "Xeenaa"
+    ],
+    "contact": {
+        "homepage": "https://github.com/xeenaa/fabric-enhancements",
+        "sources": "https://github.com/xeenaa/fabric-enhancements",
+        "issues": "https://github.com/xeenaa/fabric-enhancements/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/xeenaa-fabric-enhancements/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.xeenaa.fabricenhancements.XeenaaFabricEnhancements"
+        ],
+        "client": [
+            "com.xeenaa.fabricenhancements.client.XeenaaFabricEnhancementsClient"
+        ]
+    },
+    "depends": {
+        "fabricloader": ">=0.16.7",
+        "minecraft": "~1.21.1",
+        "java": ">=21",
+        "fabric-api": "*"
+    },
+    "suggests": {
+        "spark": ">=1.10.73"
+    },
+    "custom": {
+        "performance": {
+            "chunk_optimization": true,
+            "memory_profiling": true,
+            "metrics_collection": true,
+            "spark_integration": true
+        }
+    }
+}

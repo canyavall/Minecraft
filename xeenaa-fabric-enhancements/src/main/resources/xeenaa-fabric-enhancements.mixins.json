@@ -1,0 +1,25 @@
+{
+    "required": true,
+    "package": "com.xeenaa.fabricenhancements.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "refmap": "xeenaa-fabric-enhancements.refmap.json",
+    "mixins": [
+        "chunk.ChunkManagerMixin",
+        "chunk.ChunkStatusMixin",
+        "chunk.WorldChunkMixin",
+        "performance.ServerChunkManagerMixin",
+        "performance.ThreadedAnvilChunkStorageMixin"
+    ],
+    "client": [
+        "client.ClientChunkManagerMixin",
+        "client.ClientWorldMixin"
+    ],
+    "server": [
+        "server.ServerWorldMixin",
+        "server.ServerChunkLoadingManagerMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "minVersion": "0.8"
+}

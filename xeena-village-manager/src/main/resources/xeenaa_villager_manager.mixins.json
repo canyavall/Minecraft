@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"package": "com.xeenaa.villagermanager.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"VillagerEntityMixin",
+		"VillagerAIMixin",
+		"LivingEntityDamageMixin",
+		"VillagerBreedingMixin",
+		"VillagerSleepMixin",
+		"VillagerZombificationMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	},
+	"refmap": "xeenaa_villager_manager.refmap.json"
+}

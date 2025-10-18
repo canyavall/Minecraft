@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "com.xeenaa.villagermanager.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ZombieVillagerRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "xeenaa_villager_manager.refmap.json"
+}

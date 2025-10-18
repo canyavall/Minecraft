@@ -1,0 +1,135 @@
+# Spark Profiler Configuration for Xeenaa Fabric Enhancements
+# Production-ready configuration for chunk performance monitoring
+
+# Sampling configuration
+sampling:
+  interval: 2ms  # High-frequency sampling for chunk operations
+  timeout: 30s   # Default timeout for profiling sessions
+
+  # Thread sampling settings
+  thread-dumper:
+    enabled: true
+    interval: 10s  # Capture thread dumps every 10 seconds during profiling
+
+  # Method profiling settings
+  method-profiling:
+    enabled: true
+    min-time: 0.1ms  # Profile methods taking more than 0.1ms
+
+# Web interface configuration
+web:
+  enabled: true
+  port: 4567
+  host: "0.0.0.0"  # Bind to all interfaces (use 127.0.0.1 for localhost only)
+  trust-forwarded-headers: false
+  compression: true
+
+  # Security settings
+  public-key-auth: false
+  require-auth: false  # Set to true in production with authentication
+
+# Monitoring configuration
+monitoring:
+  # TPS monitoring
+  tps:
+    enabled: true
+    alert-threshold: 18.0
+    window-size: 100  # Number of ticks to average
+
+  # Memory monitoring
+  memory:
+    enabled: true
+    alert-threshold: "7GB"  # Alert when memory usage exceeds 7GB
+    gc-monitoring: true
+    heap-dump-on-alert: false  # Enable for debugging memory issues
+
+  # Chunk monitoring (custom metrics)
+  chunks:
+    enabled: true
+    slow-load-threshold: 50ms
+    very-slow-load-threshold: 200ms
+    track-cache-performance: true
+    max-tracked-chunks: 10000
+
+# Automatic profiling triggers
+auto-profiling:
+  enabled: true
+
+  # Low TPS trigger
+  low-tps:
+    enabled: true
+    threshold: 18.0
+    duration: 30s
+    cooldown: 300s  # 5 minutes between auto-sessions
+
+  # High memory usage trigger
+  high-memory:
+    enabled: true
+    threshold: "7GB"
+    duration: 60s
+    cooldown: 600s  # 10 minutes between auto-sessions
+
+  # Slow chunk loading trigger
+  slow-chunks:
+    enabled: true
+    threshold: 200ms
+    duration: 30s
+    cooldown: 180s  # 3 minutes between auto-sessions
+
+# Export settings
+export:
+  # Automatically export profiles
+  auto-export: true
+  export-format: "html"  # html, json, or both
+  export-directory: "performance/spark-profiles"
+  retention-days: 7  # Keep profiles for 7 days
+
+  # Compression for exports
+  compress: true
+
+# Performance settings
+performance:
+  # Maximum overhead allowed (percentage of server performance)
+  max-overhead: 1.0  # 1% maximum performance impact
+
+  # Sampling thread priority
+  sampler-thread-priority: 3  # Lower priority to avoid interference
+
+  # Buffer sizes
+  buffer-size: 8192
+  max-stack-depth: 300
+
+# Integration settings
+integration:
+  # Micrometer metrics integration
+  micrometer:
+    enabled: true
+    export-interval: 30s
+
+  # Custom metrics
+  custom-metrics:
+    enabled: true
+    chunk-load-metrics: true
+    memory-metrics: true
+    tps-metrics: true
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARN, ERROR
+  log-profiling-sessions: true
+  log-auto-triggers: true
+  log-performance-alerts: true
+
+  # Specific loggers
+  loggers:
+    sampling: "INFO"
+    web-interface: "INFO"
+    auto-profiling: "INFO"
+    monitoring: "INFO"
+
+# Development settings (override in dev environment)
+development:
+  # More aggressive profiling for development
+  enhanced-sampling: false  # Set to true in development
+  detailed-method-profiling: false
+  capture-local-variables: false  # Very expensive, use with caution

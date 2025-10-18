@@ -1,0 +1,150 @@
+{
+  "sparkIntegration": {
+    "version": "1.0.0",
+    "description": "Spark Profiler Integration for Xeenaa Fabric Enhancements",
+    "
+    "enabled": true,
+
+    "sampling": {
+      "intervalMs": 2,
+      "timeoutMs": 30000,
+      "threadDumper": {
+        "enabled": true,
+        "intervalMs": 10000
+      },
+      "methodProfiling": {
+        "enabled": true,
+        "minTimeMs": 0.1
+      }
+    },
+
+    "webInterface": {
+      "enabled": true,
+      "port": 4567,
+      "host": "0.0.0.0",
+      "compression": true,
+      "authentication": false
+    },
+
+    "monitoring": {
+      "tps": {
+        "enabled": true,
+        "alertThreshold": 18.0,
+        "windowSize": 100,
+        "realTimeMonitoring": true
+      },
+      "memory": {
+        "enabled": true,
+        "alertThresholdMB": 7168,
+        "gcMonitoring": true,
+        "heapDumpOnAlert": false,
+        "monitoringIntervalMs": 5000
+      },
+      "chunks": {
+        "enabled": true,
+        "slowLoadThresholdMs": 50.0,
+        "verySlowLoadThresholdMs": 200.0,
+        "trackCachePerformance": true,
+        "maxTrackedChunks": 10000,
+        "enableAlerting": true
+      }
+    },
+
+    "autoProfiling": {
+      "enabled": true,
+      "triggers": {
+        "lowTps": {
+          "enabled": true,
+          "threshold": 18.0,
+          "durationSeconds": 30,
+          "cooldownSeconds": 300
+        },
+        "highMemory": {
+          "enabled": true,
+          "thresholdMB": 7168,
+          "durationSeconds": 60,
+          "cooldownSeconds": 600
+        },
+        "slowChunks": {
+          "enabled": true,
+          "thresholdMs": 200.0,
+          "durationSeconds": 30,
+          "cooldownSeconds": 180
+        }
+      }
+    },
+
+    "export": {
+      "autoExport": true,
+      "format": "html",
+      "directory": "performance/spark-profiles",
+      "retentionDays": 7,
+      "compress": true
+    },
+
+    "performance": {
+      "maxOverheadPercent": 1.0,
+      "samplerThreadPriority": 3,
+      "bufferSize": 8192,
+      "maxStackDepth": 300,
+      "validation": {
+        "enabled": true,
+        "intervalMinutes": 15
+      }
+    },
+
+    "integration": {
+      "micrometer": {
+        "enabled": true,
+        "exportIntervalSeconds": 30
+      },
+      "customMetrics": {
+        "enabled": true,
+        "chunkLoadMetrics": true,
+        "memoryMetrics": true,
+        "tpsMetrics": true
+      }
+    },
+
+    "logging": {
+      "level": "INFO",
+      "logProfilingSessions": true,
+      "logAutoTriggers": true,
+      "logPerformanceAlerts": true,
+      "specificLoggers": {
+        "sampling": "INFO",
+        "webInterface": "INFO",
+        "autoProfiling": "INFO",
+        "monitoring": "INFO"
+      }
+    },
+
+    "environments": {
+      "development": {
+        "samplingIntervalMs": 1,
+        "loggingLevel": "DEBUG",
+        "enhancedSampling": true,
+        "detailedMethodProfiling": true
+      },
+      "production": {
+        "samplingIntervalMs": 5,
+        "loggingLevel": "WARN",
+        "webAuthentication": true,
+        "autoProfilingCooldownMultiplier": 2.0
+      }
+    },
+
+    "customThresholds": {
+      "chunkPerformance": {
+        "slowLoadPercentageAlert": 10.0,
+        "cacheHitRatioAlert": 0.7,
+        "maxConcurrentSlowLoads": 5
+      },
+      "serverPerformance": {
+        "tpsVariationAlert": 2.0,
+        "memoryLeakDetection": true,
+        "gcFrequencyAlert": 5
+      }
+    }
+  }
+}

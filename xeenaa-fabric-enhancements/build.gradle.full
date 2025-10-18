@@ -1,0 +1,197 @@
+plugins {
+    id 'fabric-loom' version '1.7.4'
+    id 'maven-publish'
+    id 'me.champeau.jmh' version '0.7.2'
+    id 'java-library'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+    // These repositories are required to resolve the dependencies of the gradle plugin.
+    mavenCentral()
+    gradlePluginPortal()
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
+    }
+    maven {
+        name = 'Sponge Snapshots'
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+    maven {
+        name = 'Lucko (Spark)'
+        url = 'https://repo.lucko.me/'
+    }
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "xeenaa-fabric-enhancements" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Performance monitoring and profiling dependencies
+    modImplementation "me.lucko:spark-api:${project.spark_version}"
+    modRuntimeOnly "me.lucko:spark-fabric:${project.spark_version}"
+
+    // Development and testing dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    // JMH dependencies for benchmarking
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+    jmhImplementation sourceSets.main.runtimeClasspath
+
+    // Memory allocation tracking
+    implementation 'org.openjdk.jol:jol-core:0.17'
+
+    // Metrics collection
+    implementation 'io.micrometer:micrometer-core:1.11.5'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.5'
+
+    // Configuration
+    modImplementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+}
+
+base {
+    archivesName = project.archives_base_name
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version
+    }
+}
+
+def targetJavaVersion = 21
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release = targetJavaVersion
+    }
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    archivesBaseName = project.archives_base_name
+    withSourcesJar()
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+// JMH Configuration
+jmh {
+    iterations = 5
+    benchmarkMode = ['thrpt', 'avgt']
+    batchSize = 1
+    fork = 2
+    warmupIterations = 3
+    timeUnit = 'ms'
+    verbosity = 'NORMAL'
+
+    // Generate performance reports
+    humanReadableOutput = true
+    includeTests = false
+
+    // Output configuration
+    resultsFile = project.file("${project.buildDir}/reports/jmh/results.txt")
+    resultFormat = 'JSON'
+}
+
+// Performance testing tasks
+task collectBaseline(type: JavaExec) {
+    group = 'performance'
+    description = 'Collect baseline performance measurements'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.xeenaa.fabricenhancements.performance.BaselineCollector'
+
+    doFirst {
+        file("${project.projectDir}/performance/baselines").mkdirs()
+    }
+}
+
+task performanceTest(type: Test) {
+    group = 'performance'
+    description = 'Run performance regression tests'
+    useJUnitPlatform()
+    include '**/performance/**'
+
+    systemProperty 'performance.baseline.dir', "${project.projectDir}/performance/baselines"
+    systemProperty 'performance.reports.dir', "${project.projectDir}/performance/reports"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+}
+
+task generatePerformanceReport(type: JavaExec) {
+    group = 'performance'
+    description = 'Generate comprehensive performance report'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.xeenaa.fabricenhancements.performance.ReportGenerator'
+
+    dependsOn jmh, performanceTest
+
+    doFirst {
+        file("${project.projectDir}/performance/reports").mkdirs()
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}"}
+    }
+}
+
+// If you plan to use a different file for the license, don't forget to change the file name here!
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // resolving dependencies.
+    }
+}
