@@ -156,13 +156,13 @@ public class ServerPacketHandler {
             Registries.VILLAGER_PROFESSION.getId(originalProfession),
             Registries.VILLAGER_PROFESSION.getId(profession));
 
-        // Set the new profession
-        villager.setVillagerData(villager.getVillagerData().withProfession(profession));
+        // Set the new profession and reset to novice level (level 1)
+        villager.setVillagerData(villager.getVillagerData()
+            .withProfession(profession)
+            .withLevel(1));
 
-        // Lock profession by setting experience to master level (250 XP)
-        // This prevents the profession from being reset by villager AI
-        villager.setExperience(250);
-        villager.setVillagerData(villager.getVillagerData().withLevel(5));
+        // Set experience to 1 (minimum needed to keep profession)
+        villager.setExperience(1);
 
         // Reinitialize brain for normal AI behavior
         villager.reinitializeBrain((ServerWorld) villager.getWorld());
@@ -176,6 +176,10 @@ public class ServerPacketHandler {
                 villager.getUuid());
 
             createAndSyncGuardData(villager);
+        } else {
+            // For non-guard professions, update display based on config
+            // (guards are handled in createAndSyncGuardData via guardData.updateDisplayName)
+            com.xeenaa.villagermanager.display.VillagerDisplayNameManager.updateVillagerDisplay(villager);
         }
     }
 
@@ -508,6 +512,9 @@ public class ServerPacketHandler {
 
         // Change the villager's profession
         changeProfession(villager, newProfession);
+
+        // Update display name based on configuration (clears guard rank, may show new profession)
+        com.xeenaa.villagermanager.display.VillagerDisplayNameManager.updateVillagerDisplay(villager);
 
         XeenaaVillagerManager.LOGGER.info("Completed guard profession change: villager {} changed to {}, {} emeralds lost as penalty, guard data cleaned up",
             villager.getId(), Registries.VILLAGER_PROFESSION.getId(newProfession), emeraldsLost);

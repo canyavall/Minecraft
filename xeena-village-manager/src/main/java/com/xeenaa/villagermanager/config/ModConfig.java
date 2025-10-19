@@ -3,6 +3,7 @@ package com.xeenaa.villagermanager.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xeenaa.villagermanager.XeenaaVillagerManager;
+import com.xeenaa.villagermanager.display.VillagerDisplayMode;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
@@ -23,6 +24,9 @@ public class ModConfig {
 
     // Configuration fields
     public List<String> blacklisted_professions = new ArrayList<>();
+
+    // Villager display mode (stored as string for JSON serialization)
+    public String villager_display_mode = "show_all";
 
     // Guard profession settings
     public GuardSettings guard_settings = new GuardSettings();
@@ -174,6 +178,21 @@ public class ModConfig {
      */
     public boolean isGuardProfessionEnabled() {
         return guard_settings != null && guard_settings.enabled;
+    }
+
+    /**
+     * Get the villager display mode configuration
+     */
+    public VillagerDisplayMode getVillagerDisplayMode() {
+        return VillagerDisplayMode.fromId(villager_display_mode);
+    }
+
+    /**
+     * Set the villager display mode and save configuration
+     */
+    public void setVillagerDisplayMode(VillagerDisplayMode mode) {
+        this.villager_display_mode = mode.getId();
+        saveConfig();
     }
 
     // Equipment check method removed - replaced with ranking system

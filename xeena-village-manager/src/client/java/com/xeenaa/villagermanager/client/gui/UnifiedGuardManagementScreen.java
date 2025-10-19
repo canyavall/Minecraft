@@ -9,6 +9,7 @@ import com.xeenaa.villagermanager.data.GuardData;
 import com.xeenaa.villagermanager.data.rank.GuardPath;
 import com.xeenaa.villagermanager.data.rank.GuardRank;
 import com.xeenaa.villagermanager.network.GuardConfigPacket;
+import com.xeenaa.villagermanager.network.GuardProfessionChangePacket;
 import com.xeenaa.villagermanager.network.PurchaseRankPacket;
 import com.xeenaa.villagermanager.network.SelectProfessionPacket;
 import com.xeenaa.villagermanager.profession.ModProfessions;
@@ -98,12 +99,44 @@ public class UnifiedGuardManagementScreen extends Screen {
     protected void init() {
         super.init();
 
+        // Reload guard data in case profession changed since screen was created
+        reloadGuardData();
+
         calculateLayout();
         loadAvailableProfessions();
         createProfessionButtons();
         createControlButtons();
 
         XeenaaVillagerManager.LOGGER.debug("Initialized UnifiedGuardManagementScreen");
+    }
+
+    /**
+     * Reloads guard data from the client cache to ensure UI reflects current profession.
+     * <p>
+     * This method is called during init() to handle profession changes. When a villager's
+     * profession is changed to Guard, the server creates GuardData and syncs it to the
+     * client cache. This method reads that fresh data so rank controls appear immediately.
+     * </p>
+     * <p>
+     * <strong>Bug Fix (P3-TASK-008):</strong> Before this method existed, guardData was
+     * only loaded in the constructor. After profession changes, the screen would refresh
+     * but guardData remained stale, causing rank buttons to not appear.
+     * </p>
+     *
+     * @since 1.0.0
+     */
+    private void reloadGuardData() {
+        if (targetVillager.getVillagerData().getProfession() == ModProfessions.GUARD) {
+            ClientGuardDataCache cache = ClientGuardDataCache.getInstance();
+            this.guardData = cache.getGuardData(targetVillager);
+            XeenaaVillagerManager.LOGGER.debug("Reloaded guard data for villager {} - guardData is {}",
+                targetVillager.getUuid(), guardData != null ? "present" : "null");
+        } else {
+            // Clear guard data if villager is no longer a guard
+            this.guardData = null;
+            XeenaaVillagerManager.LOGGER.debug("Villager {} is not a guard, cleared guardData",
+                targetVillager.getUuid());
+        }
     }
 
     private void calculateLayout() {
@@ -630,6 +663,10 @@ public class UnifiedGuardManagementScreen extends Screen {
      * Creates Confirm and Cancel buttons positioned at the bottom of the dialog.
      * Confirm button proceeds with profession change, Cancel button dismisses dialog.
      * </p>
+     * <p>
+     * <strong>CRITICAL:</strong> Buttons must be added to drawable children to receive
+     * click events. They are also removed when the dialog closes to prevent memory leaks.
+     * </p>
      */
     private void initConfirmDialog() {
         int dialogWidth = 300;
@@ -644,10 +681,33 @@ public class UnifiedGuardManagementScreen extends Screen {
         // Confirm button (left side)
         confirmButton = ButtonWidget.builder(Text.literal("Confirm"), button -> {
             XeenaaVillagerManager.LOGGER.info("User confirmed Guard -> {} profession change", pendingProfessionId);
-            this.showingConfirmDialog = false;
-            sendProfessionChangePacket(pendingProfessionId);
+            closeConfirmDialog();
+
+            // Send GuardProfessionChangePacket with confirmed=true (not SelectProfessionPacket!)
+            // This tells the server the user confirmed the emerald loss warning
+            GuardProfessionChangePacket packet = new GuardProfessionChangePacket(
+                targetVillager.getId(),
+                pendingProfessionId,
+                true  // confirmed
+            );
+            ClientPlayNetworking.send(packet);
+
             this.pendingProfessionId = null;
             this.pendingProfessionName = null;
+
+            // Refresh screen after short delay to reflect changes
+            MinecraftClient.getInstance().execute(() -> {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(300);
+                        MinecraftClient.getInstance().execute(() -> {
+                            this.clearAndInit();
+                        });
+                    } catch (InterruptedException e) {
+                        // Ignore interruption
+                    }
+                }).start();
+            });
         })
         .dimensions(dialogX + 50, buttonY, buttonWidth, buttonHeight)
         .build();
@@ -655,12 +715,33 @@ public class UnifiedGuardManagementScreen extends Screen {
         // Cancel button (right side)
         cancelButton = ButtonWidget.builder(Text.literal("Cancel"), button -> {
             XeenaaVillagerManager.LOGGER.info("User cancelled Guard profession change");
-            this.showingConfirmDialog = false;
+            closeConfirmDialog();
             this.pendingProfessionId = null;
             this.pendingProfessionName = null;
         })
         .dimensions(dialogX + 170, buttonY, buttonWidth, buttonHeight)
         .build();
+
+        // NOTE: Buttons are NOT added to drawable children because they're rendered
+        // manually in renderConfirmationDialog() AFTER the overlay. Adding them to
+        // drawable children would cause them to be rendered twice and covered by overlay.
+    }
+
+    /**
+     * Closes the confirmation dialog and cleans up button references.
+     * <p>
+     * This method ensures proper cleanup of dialog button references.
+     * Buttons are not added to drawable children, so no removal is needed.
+     * </p>
+     */
+    private void closeConfirmDialog() {
+        this.showingConfirmDialog = false;
+
+        // Clear button references (they were never added to drawable children)
+        confirmButton = null;
+        cancelButton = null;
+
+        XeenaaVillagerManager.LOGGER.debug("Confirmation dialog closed and buttons cleared");
     }
 
     /**
@@ -687,7 +768,7 @@ public class UnifiedGuardManagementScreen extends Screen {
         // Handle ESC key when dialog is showing
         if (showingConfirmDialog && keyCode == 256) { // GLFW.GLFW_KEY_ESCAPE = 256
             XeenaaVillagerManager.LOGGER.info("User pressed ESC to cancel Guard profession change");
-            this.showingConfirmDialog = false;
+            closeConfirmDialog();
             this.pendingProfessionId = null;
             this.pendingProfessionName = null;
             return true;
@@ -700,11 +781,15 @@ public class UnifiedGuardManagementScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Handle dialog button clicks when dialog is showing
         if (showingConfirmDialog) {
-            if (confirmButton != null && confirmButton.mouseClicked(mouseX, mouseY, button)) {
-                return true;
+            if (confirmButton != null) {
+                if (confirmButton.mouseClicked(mouseX, mouseY, button)) {
+                    return true;
+                }
             }
-            if (cancelButton != null && cancelButton.mouseClicked(mouseX, mouseY, button)) {
-                return true;
+            if (cancelButton != null) {
+                if (cancelButton.mouseClicked(mouseX, mouseY, button)) {
+                    return true;
+                }
             }
             // Block all other clicks when dialog is showing
             return true;

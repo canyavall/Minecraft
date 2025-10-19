@@ -252,13 +252,8 @@ public class GuardData {
      * @param villager the villager entity to update
      */
     public void updateDisplayName(VillagerEntity villager) {
-        com.xeenaa.villagermanager.data.rank.GuardRank rank = rankData.getCurrentRank();
-        net.minecraft.text.Text displayName = createRankDisplayName(rank);
-        villager.setCustomName(displayName);
-        villager.setCustomNameVisible(true);
-
-        XeenaaVillagerManager.LOGGER.debug("Updated display name for guard {} to: {}",
-            villagerId, displayName.getString());
+        // Delegate to VillagerDisplayNameManager which respects config settings
+        com.xeenaa.villagermanager.display.VillagerDisplayNameManager.updateVillagerDisplay(villager);
     }
 
     /**
