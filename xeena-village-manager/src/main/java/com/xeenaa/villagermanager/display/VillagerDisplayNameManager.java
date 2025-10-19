@@ -31,35 +31,23 @@ public class VillagerDisplayNameManager {
         VillagerDisplayMode mode = ModConfig.getInstance().getVillagerDisplayMode();
         boolean isGuardVillager = isGuard(villager);
 
-        XeenaaVillagerManager.LOGGER.info(
-            "[VillagerDisplayNameManager] updateVillagerDisplay called for {}: mode={}, isGuard={}",
-            villager.getUuid(),
-            mode,
-            isGuardVillager
-        );
-
         switch (mode) {
             case NONE:
-                XeenaaVillagerManager.LOGGER.info("[VillagerDisplayNameManager] Mode is NONE, clearing display");
                 clearVillagerDisplay(villager);
                 break;
 
             case GUARDS_ONLY:
                 if (isGuardVillager) {
-                    XeenaaVillagerManager.LOGGER.info("[VillagerDisplayNameManager] Mode is GUARDS_ONLY, updating guard display");
                     updateGuardDisplay(villager);
                 } else {
-                    XeenaaVillagerManager.LOGGER.info("[VillagerDisplayNameManager] Mode is GUARDS_ONLY, clearing non-guard display");
                     clearVillagerDisplay(villager);
                 }
                 break;
 
             case SHOW_ALL:
                 if (isGuardVillager) {
-                    XeenaaVillagerManager.LOGGER.info("[VillagerDisplayNameManager] Mode is SHOW_ALL, updating guard display");
                     updateGuardDisplay(villager);
                 } else {
-                    XeenaaVillagerManager.LOGGER.info("[VillagerDisplayNameManager] Mode is SHOW_ALL, updating regular villager display");
                     updateRegularVillagerDisplay(villager);
                 }
                 break;
@@ -129,20 +117,9 @@ public class VillagerDisplayNameManager {
         VillagerProfession profession = data.getProfession();
         int level = data.getLevel();
 
-        XeenaaVillagerManager.LOGGER.info(
-            "[VillagerDisplayNameManager] updateRegularVillagerDisplay called for {}: profession={}, level={}",
-            villager.getUuid(),
-            profession.id(),
-            level
-        );
-
         // Don't show display for nitwits or unemployed
         if (profession == net.minecraft.village.VillagerProfession.NONE ||
             profession == net.minecraft.village.VillagerProfession.NITWIT) {
-            XeenaaVillagerManager.LOGGER.info(
-                "[VillagerDisplayNameManager] Clearing display for NONE/NITWIT villager {}",
-                villager.getUuid()
-            );
             clearVillagerDisplay(villager);
             return;
         }
@@ -152,11 +129,8 @@ public class VillagerDisplayNameManager {
         villager.setCustomName(displayName);
         villager.setCustomNameVisible(true);
 
-        XeenaaVillagerManager.LOGGER.info(
-            "[VillagerDisplayNameManager] Updated villager display for {} to: '{}'",
-            villager.getUuid(),
-            displayName.getString()
-        );
+        XeenaaVillagerManager.LOGGER.debug("Updated villager display for {} to: {}",
+            villager.getUuid(), displayName.getString());
     }
 
     /**

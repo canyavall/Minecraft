@@ -1,10 +1,10 @@
-[15:03:28] [Test worker/INFO]: Guard 430a533b-ce6d-488c-9fe4-a3cb1e95e8bd chose specialization path: Man-at-Arms
-[15:03:28] [Test worker/INFO]: Rank purchased for villager 430a533b-ce6d-488c-9fe4-a3cb1e95e8bd: Soldier I (cost: 15 emeralds, total spent: 15)
-[15:03:28] [Test worker/INFO]: Guard f3841eaa-dff1-4ef1-a227-0014f331663b chose specialization path: Marksman
-[15:03:28] [Test worker/INFO]: Rank purchased for villager f3841eaa-dff1-4ef1-a227-0014f331663b: Ranger I (cost: 15 emeralds, total spent: 15)
-[15:03:28] [Test worker/INFO]: Rank purchased for villager f3841eaa-dff1-4ef1-a227-0014f331663b: Ranger II (cost: 20 emeralds, total spent: 35)
-[15:03:28] [Test worker/INFO]: Guard ce505e4d-fac5-494e-9f8f-cd4725063e04 chose specialization path: Man-at-Arms
-[15:03:28] [Test worker/INFO]: Rank purchased for villager ce505e4d-fac5-494e-9f8f-cd4725063e04: Soldier I (cost: 15 emeralds, total spent: 15)
-[15:03:28] [Test worker/INFO]: Rank purchased for villager ce505e4d-fac5-494e-9f8f-cd4725063e04: Soldier II (cost: 20 emeralds, total spent: 35)
-[15:03:28] [Test worker/INFO]: Guard 130a03cd-0428-468c-a4ed-5140982ca0c1 chose specialization path: Man-at-Arms
-[15:03:28] [Test worker/INFO]: Rank purchased for villager 130a03cd-0428-468c-a4ed-5140982ca0c1: Soldier I (cost: 15 emeralds, total spent: 15)
+[15:40:37] [Test worker/INFO]: Guard da7536d8-f95d-45c9-9c86-b95997e142d7 chose specialization path: Man-at-Arms
+[15:40:37] [Test worker/INFO]: Rank purchased for villager da7536d8-f95d-45c9-9c86-b95997e142d7: Soldier I (cost: 15 emeralds, total spent: 15)
+[15:40:37] [Test worker/INFO]: Guard bb354190-d6f6-4928-a4d5-1388cf078f89 chose specialization path: Marksman
+[15:40:37] [Test worker/INFO]: Rank purchased for villager bb354190-d6f6-4928-a4d5-1388cf078f89: Ranger I (cost: 15 emeralds, total spent: 15)
+[15:40:37] [Test worker/INFO]: Rank purchased for villager bb354190-d6f6-4928-a4d5-1388cf078f89: Ranger II (cost: 20 emeralds, total spent: 35)
+[15:40:37] [Test worker/INFO]: Guard 478e2049-263a-457a-8975-56112d5ab3a6 chose specialization path: Man-at-Arms
+[15:40:37] [Test worker/INFO]: Rank purchased for villager 478e2049-263a-457a-8975-56112d5ab3a6: Soldier I (cost: 15 emeralds, total spent: 15)
+[15:40:37] [Test worker/INFO]: Rank purchased for villager 478e2049-263a-457a-8975-56112d5ab3a6: Soldier II (cost: 20 emeralds, total spent: 35)
+[15:40:37] [Test worker/INFO]: Guard e08d5c45-b179-48d5-95d8-4e688f10dbfb chose specialization path: Man-at-Arms
+[15:40:37] [Test worker/INFO]: Rank purchased for villager e08d5c45-b179-48d5-95d8-4e688f10dbfb: Soldier I (cost: 15 emeralds, total spent: 15)

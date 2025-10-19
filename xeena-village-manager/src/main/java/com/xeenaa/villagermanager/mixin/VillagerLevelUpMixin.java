@@ -43,13 +43,6 @@ public abstract class VillagerLevelUpMixin {
         if (!villager.getWorld().isClient()) {
             // Store the current data before it gets changed
             xeenaa$previousData = this.getVillagerData();
-
-            XeenaaVillagerManager.LOGGER.info(
-                "[VillagerLevelUpMixin] BEFORE setVillagerData for {}: profession={}, level={}",
-                villager.getUuid(),
-                xeenaa$previousData.getProfession().id(),
-                xeenaa$previousData.getLevel()
-            );
         }
     }
 
@@ -82,26 +75,13 @@ public abstract class VillagerLevelUpMixin {
             VillagerData oldData = xeenaa$previousData;
             VillagerData newData = villagerData;
 
-            XeenaaVillagerManager.LOGGER.info(
-                "[VillagerLevelUpMixin] AFTER setVillagerData for {}: profession={}, level={}",
-                villager.getUuid(),
-                newData.getProfession().id(),
-                newData.getLevel()
-            );
-
             // Check if level or profession changed
             boolean levelChanged = oldData.getLevel() != newData.getLevel();
             boolean professionChanged = !oldData.getProfession().equals(newData.getProfession());
 
-            XeenaaVillagerManager.LOGGER.info(
-                "[VillagerLevelUpMixin] Change detection: levelChanged={}, professionChanged={}",
-                levelChanged,
-                professionChanged
-            );
-
             if (levelChanged || professionChanged) {
-                XeenaaVillagerManager.LOGGER.info(
-                    "[VillagerLevelUpMixin] Villager data CHANGED for {}: level {} -> {}, profession {} -> {}",
+                XeenaaVillagerManager.LOGGER.debug(
+                    "Villager {} data changed: level {} -> {}, profession {} -> {}",
                     villager.getUuid(),
                     oldData.getLevel(),
                     newData.getLevel(),
@@ -109,25 +89,8 @@ public abstract class VillagerLevelUpMixin {
                     newData.getProfession().id()
                 );
 
-                // Log current display mode
-                var displayMode = ModConfig.getInstance().getVillagerDisplayMode();
-                XeenaaVillagerManager.LOGGER.info(
-                    "[VillagerLevelUpMixin] Current display mode: {}",
-                    displayMode
-                );
-
                 // Update display name based on current configuration
                 VillagerDisplayNameManager.updateVillagerDisplay(villager);
-
-                XeenaaVillagerManager.LOGGER.info(
-                    "[VillagerLevelUpMixin] Updated display for villager {}",
-                    villager.getUuid()
-                );
-            } else {
-                XeenaaVillagerManager.LOGGER.info(
-                    "[VillagerLevelUpMixin] No changes detected for villager {}",
-                    villager.getUuid()
-                );
             }
 
             // Clear the previous data
