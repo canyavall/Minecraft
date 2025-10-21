@@ -44,6 +44,9 @@ workspace/
 │   │   ├── minecraft-modding/         # Minecraft core systems (loader-agnostic)
 │   │   ├── fabric-modding/            # Fabric API specific
 │   │   ├── minecraft-performance/     # Performance optimization strategies
+│   │   ├── performance-testing/       # Performance measurement and validation
+│   │   ├── coding-standards/          # Code standards and conventions
+│   │   ├── ui-ux-design/              # GUI design and implementation
 │   │   ├── java-development/          # Java 21 best practices
 │   │   ├── research-methodology/      # Research process
 │   │   ├── epic-requirements/         # requirements.md creation
@@ -58,6 +61,7 @@ workspace/
 │   │   ├── project.md                # Project overview
 │   │   ├── research/                 # Project-specific research
 │   │   ├── temp/                     # Temporary files
+│   │   ├── ui/                       # UI mockups and specifications (if applicable)
 │   │   ├── game-design/              # Game mechanics (if applicable)
 │   │   └── epics/                    # Epic-based organization
 │   │       ├── 01-epic-name/
@@ -246,6 +250,21 @@ Skills provide specialized knowledge that agents automatically use when relevant
 - CPU optimization (algorithm complexity, lazy evaluation)
 - Performance budget guidelines
 
+#### 📊 performance-testing
+**Knowledge**: Performance measurement and validation methodology for Minecraft mods
+**Activates When**: Validating optimizations, measuring baseline performance, creating test plans, reporting results
+**Contains**:
+- Testing methodology (6-phase process: baseline → implement → retest → validate → report → monitor)
+- Profiling tools (Spark Profiler, Java Flight Recorder, Minecraft debug, custom monitoring)
+- Test scenarios (chunk loading stress, world loading, server stress, long-term stability)
+- Key metrics (TPS, MSPT, memory, chunk operations, GC frequency)
+- Performance targets (improvement ranges, success criteria, statistical requirements)
+- Data collection templates (baseline results, test configuration, observations)
+- Statistical validation (t-tests, confidence intervals, reproducibility)
+- Reporting templates (executive summary, results tables, statistical analysis)
+- Regression detection (automated tests, performance thresholds, alerts)
+- Real-world validation (beta testing, player feedback, production monitoring)
+
 #### 📏 coding-standards
 **Knowledge**: Java and Minecraft modding coding standards, naming conventions, architecture patterns
 **Activates When**: Writing any code, creating classes/methods, organizing packages, documenting code
@@ -262,6 +281,20 @@ Skills provide specialized knowledge that agents automatically use when relevant
 - Mod compatibility guidelines (defensive coding, deprecation)
 - Security and validation (never trust client input)
 - Standards compliance checklist
+
+#### 🎨 ui-ux-design
+**Knowledge**: GUI design and implementation for Minecraft screens, HandledScreen patterns, layout specifications
+**Activates When**: Designing custom GUIs, implementing screens, creating UI mockups, positioning widgets
+**Contains**:
+- UI folder system (mockups, specifications, source files)
+- Minecraft GUI constraints (HandledScreen, texture coordinates, standard dimensions)
+- Layout specification template (exact dimensions, ASCII diagrams, component positions)
+- UI behavior specification template (workflows, states, networking, accessibility)
+- Minecraft GUI best practices (vanilla aesthetics, grid layouts, responsive positioning)
+- Widget implementation patterns (buttons, custom widgets, tabs, scrollable lists)
+- Texture atlas mapping (256×256 layout, U/V coordinates)
+- Performance optimization (render culling, cached calculations)
+- Integration with epic/implementation workflow
 
 #### ☕ java-development
 **Knowledge**: Java 21 features, records, pattern matching, sealed classes, modern best practices
@@ -383,8 +416,8 @@ Each skill directory contains:
 **Agents reference skills**:
 - epic-agent uses epic-requirements skill when creating requirements.md
 - planning-agent uses task-planning skill when creating tasks.md
-- implementation-agent uses minecraft-modding, fabric-modding, minecraft-performance, java-development, defensive-programming, and logging-strategy skills when coding
-- validation-agent uses defensive-programming and logging-strategy skills when creating tests
+- implementation-agent uses coding-standards, minecraft-modding, fabric-modding, minecraft-performance, performance-testing, ui-ux-design, java-development, defensive-programming, and logging-strategy skills when coding
+- validation-agent uses defensive-programming, logging-strategy, and performance-testing skills when creating tests
 - research-agent uses research-methodology skill when investigating
 
 **All knowledge consolidated in skills**:
@@ -392,6 +425,8 @@ Each skill directory contains:
 - **minecraft-modding**: How Minecraft systems work (entities, ticking, world structure)
 - **fabric-modding**: Fabric API knowledge (events, networking, registries)
 - **minecraft-performance**: Performance optimization (profiling, caching, tick budget)
+- **performance-testing**: Performance measurement and validation (baselines, profiling tools, statistical analysis)
+- **ui-ux-design**: GUI design (HandledScreen, layouts, mockups, specifications)
 - **defensive-programming**: Testing strategies and regression prevention
 - **logging-strategy**: Proactive logging and observability
 
