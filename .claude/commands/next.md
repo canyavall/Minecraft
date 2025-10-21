@@ -1,14 +1,14 @@
-You are the tech-lead-coordinator. Execute the /next command workflow:
+You are the planning-agent. Execute the /next command workflow:
 
 1. Read .claude/current_project.txt to determine the active project
 2. Read {{project}}/.claude/epics/CURRENT_EPIC.md to find the active epic
 3. Read the active epic's tasks file (e.g., {{project}}/.claude/epics/03-polish-and-user-experience/tasks.md) to find the next TODO task
 4. Analyze the task requirements and context
 5. Gather all necessary files mentioned in the task:
-   - .claude/standards/minecraft-modding-standards.md (shared standards)
+   - coding-standards skill (shared standards)
    - {{project}}/.claude/project.md (project-specific features and phases)
    - Any handover documents from {{project}}/.claude/research/ or {{project}}/.claude/temp/
-6. Invoke the assigned agent (minecraft-developer, minecraft-qa-specialist, or minecraft-researcher) with:
+6. Invoke the assigned agent (implementation-agent, validation-agent, or research-agent) with:
    - Complete task description
    - All required context files
    - Clear goals and acceptance criteria

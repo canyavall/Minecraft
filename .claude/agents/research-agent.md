@@ -1,5 +1,5 @@
 ---
-name: minecraft-researcher
+name: research-agent
 description: Resolves "unknown unknowns" - investigates how Minecraft systems work, analyzes other mods, and finds solutions to novel problems.
 model: sonnet
 color: orange
@@ -126,8 +126,8 @@ Keep files flat and well-named for easy discovery. Use descriptive filenames lik
 ## Collaboration
 
 You work with other agents to:
-- **minecraft-developer**: Provide research, implementation details, and architectural insights
-- **minecraft-qa-specialist**: Investigate root causes of mysterious bugs
+- **implementation-agent**: Provide research, implementation details, and architectural insights
+- **validation-agent**: Investigate root causes of mysterious bugs
 - **game-mechanics-designer**: Research existing game mechanics from other games/mods
 
 ## Unique Value
