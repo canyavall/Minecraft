@@ -190,40 +190,58 @@
 
 ---
 
-### P4-TASK-003.1: Analyze and Compare Ranged Guard Stats
+### P4-TASK-003.1: Analyze and Compare Guard Combat Stats & Implement Balance
 **Status**: ✅ COMPLETED
-**Priority**: Medium
+**Priority**: High
 **Assignee**: minecraft-researcher + minecraft-developer
-**Estimated Effort**: 1-2 hours
-**Actual Time**: ~1.5 hours
+**Estimated Effort**: 3-4 hours
+**Actual Time**: ~4 hours (including iterative balance testing)
 **Dependencies**: None
 **Start Date**: October 19, 2025
 **Completion Date**: October 19, 2025
-**Analysis Report**: `.claude/epics/04-multiplayer-ownership-and-ui/P4-TASK-003.1-Ranged-Guard-Stats-Analysis.md`
+**Analysis Reports**:
+- Original: `.claude/epics/04-multiplayer-ownership-and-ui/P4-TASK-003.1-Ranged-Guard-Stats-Analysis.md`
+- Revised: `.claude/epics/04-multiplayer-ownership-and-ui/P4-TASK-003.1-REVISED-Guard-Balance-Analysis.md`
+- Testing Guide: `.claude/epics/04-multiplayer-ownership-and-ui/P4-TASK-003.1-Balance-Testing-Guide.md`
 
-**Goal**: Research and compare ranged guard (Sharpshooter) combat statistics with vanilla Minecraft bow-using mobs (Skeleton, Pillager) to ensure guards are balanced and competitive.
+**Goal**: Research and compare guard combat statistics (both ranged and melee) with vanilla Minecraft mobs, identify balance issues, and implement fixes.
 
-**Analysis Completed**: ✅ ALL RESEARCH AREAS COVERED
-- ✅ Attack range analyzed and compared
-- ✅ Damage output breakdown by tier
-- ✅ Attack speed/fire rate comparison
-- ✅ Accuracy comparison
-- ✅ Special abilities documented
-- ✅ Tactical AI behavior evaluated
-- ✅ Balance assessment and recommendations provided
+**Analysis Completed**: ✅ ALL RESEARCH + BALANCE IMPLEMENTATION + USER VALIDATION
+- ✅ Ranged guards vs Skeleton/Pillager comparison
+- ✅ Melee guards vs Zombie/Vindicator comparison
+- ✅ Attack range, damage, speed, and DPS analysis
+- ✅ **CRITICAL ISSUE FOUND**: Guards overpowered due to accelerated tick rate
+- ✅ Balance fixes implemented through iterative testing
+- ✅ All 372 tests passed after implementation
+- ✅ **Manual in-game testing completed - balance validated by user**
 
-**Key Findings**:
-1. **Attack Range**: Guards match Skeleton (16 blocks), exceed Pillager (8 blocks)
-2. **Damage**: Lower base (2.5 vs 3-4 vanilla), compensated by special abilities at higher tiers
-3. **Attack Speed**: Tier 4 guards faster than both vanilla mobs (0.9s vs 1-3s)
-4. **Accuracy**: Tier 4 matches Skeleton Normal difficulty (accuracy 6)
-5. **Special Abilities**: Guards have significant advantage (Double Shot, Multishot, Precision Shot, Slowness arrows)
-6. **Tactical AI**: Far superior positioning, kiting, and high-ground seeking
+**Critical Issues Found & Fixed**:
+1. ❌ **Accelerated tick rate**: `tick()` called ~32 times/second instead of 20
+2. ❌ **Melee guards too strong**: Killing 2+ zombies at Tier 0-1
+3. ✅ **Fix**: Compensated cooldowns by ~60% and reduced damage scaling
 
-**Balance Assessment**:
-✅ **Intentional progression curve** - weak early, strong late
-✅ **Recommended**: Keep current balance (fits RPG investment model)
-⚠️ **Optional**: Consider tier-based damage scaling if early guards feel too weak
+**Final Balance (GuardDirectAttackGoal.java)**:
+
+**Melee Guards** (with Iron Sword):
+- **Tier 0**: 5.15 damage, 60 ticks cooldown (~1.875s) = 2.75 DPS (weaker than Zombie's 3.0)
+- **Tier 1**: 5.25 damage, 54 ticks cooldown (~1.69s) = 3.1 DPS (very close to Zombie's 3.0)
+- **Tier 2**: 5.5 damage, 48 ticks cooldown = 3.93 DPS
+- **Tier 4**: 6.2 damage, 32 ticks cooldown = 6.2 DPS
+
+**Balance Validation**:
+- ✅ Tier 0 guards lose to zombies (2.75 < 3.0 DPS)
+- ✅ Tier 1 guards very close fights with zombies (user feedback: "very close!")
+- ✅ Progression feels justified by emerald investment
+- ✅ User acceptance testing PASSED
+
+**Files Modified**:
+1. `GuardDirectAttackGoal.java` (melee damage and cooldown formulas)
+2. `VillagerAIMixin.java` (added GuardDirectAttackGoal to removal list)
+
+**Testing Results**:
+- ✅ Compilation successful
+- ✅ All 372 tests passed
+- ✅ **Manual in-game testing completed and validated by user**
 
 **Research Areas**:
 1. **Attack Range**:
@@ -250,12 +268,106 @@
 - Test results from in-game observations
 
 **Acceptance Criteria**:
-- [ ] Guard ranged attack range documented
-- [ ] Skeleton and Pillager stats researched
-- [ ] Damage comparison table created
-- [ ] Attack speed comparison documented
-- [ ] Recommendations provided (if imbalanced)
-- [ ] In-game testing completed
+- [x] Guard melee combat stats researched and balanced
+- [x] Guard ranged combat stats researched (partial - needs full validation)
+- [x] Damage comparison completed
+- [x] Attack speed comparison documented
+- [x] Balance fixes implemented
+- [x] In-game testing completed and validated
+
+---
+
+### P4-TASK-003.5: Implement Passive Guard Health Regeneration
+**Status**: 📋 TODO
+**Priority**: Medium-High
+**Assignee**: minecraft-developer
+**Estimated Effort**: 2-3 hours
+**Dependencies**: None
+**Start Date**: October 19, 2025
+
+**Goal**: Implement passive health regeneration for guards after 60 seconds out of combat (similar to vanilla player hunger-based regeneration).
+
+**Current State**:
+- ✅ Guards currently have retreat-based regeneration (GuardRetreatGoal.java)
+  - Only activates when health < 20%
+  - Guard retreats to safety
+  - Heals every 2 seconds while retreating
+  - Stops at 50% health or after 30 seconds
+- ❌ No passive regeneration when out of combat
+
+**Proposed System**:
+
+1. **New AI Goal: GuardPassiveRegenerationGoal**
+   - Priority: 10 (very low, doesn't interfere with other goals)
+   - Activates when: Guard has been out of combat for 60 seconds
+   - Behavior: Heals slowly over time
+   - Stops when: Full health OR guard enters combat
+
+2. **Regeneration Mechanics**:
+   ```java
+   - Out-of-combat timer: 60 seconds (1200 ticks)
+   - Regen interval: 4 seconds (80 ticks) - slower than vanilla player
+   - Regen amount: 0.5 + (tier × 0.25) HP per tick
+     - Tier 0: 0.5 HP every 4s = 0.125 HP/s
+     - Tier 2: 1.0 HP every 4s = 0.25 HP/s
+     - Tier 4: 1.5 HP every 4s = 0.375 HP/s
+   ```
+
+3. **Combat Detection**:
+   - Combat state tracked per guard
+   - Enters combat when:
+     - Guard attacks a target
+     - Guard takes damage
+     - Guard has a target (getTarget() != null)
+   - Exits combat when:
+     - No target for 60 seconds
+     - Not taking damage for 60 seconds
+     - Not attacking for 60 seconds
+
+4. **Integration with GuardAIScheduler**:
+   - Reuse existing combat state tracking
+   - Add `lastCombatTick` timestamp
+   - Calculate time since last combat activity
+
+**Implementation Plan**:
+
+1. Create `GuardPassiveRegenerationGoal.java`
+2. Add combat timer tracking to `GuardData` or `GuardAIScheduler`
+3. Register goal in `VillagerAIMixin.java`
+4. Add visual particle effects (optional - green sparkles when regenerating)
+5. Add logging for debugging
+
+**Files to Modify**:
+1. Create: `GuardPassiveRegenerationGoal.java`
+2. Modify: `VillagerAIMixin.java` (register new goal)
+3. Modify: `GuardAIScheduler.java` (track combat timer)
+4. Optional: `GuardDirectAttackGoal.java` (mark combat activity)
+
+**Configuration** (optional for Phase 2):
+```java
+- passive_regen_enabled: boolean (default: true)
+- passive_regen_delay_ticks: int (default: 1200 / 60 seconds)
+- passive_regen_interval_ticks: int (default: 80 / 4 seconds)
+```
+
+**Testing Requirements**:
+1. Guard regenerates health after 60 seconds of no combat
+2. Regeneration stops when entering combat
+3. Regeneration rate scales with tier
+4. Doesn't interfere with retreat-based regeneration
+5. Works correctly in all guard modes (STAND, FOLLOW, PATROL)
+6. Performance impact minimal (tested with 20+ guards)
+
+**Acceptance Criteria**:
+- [ ] GuardPassiveRegenerationGoal implemented
+- [ ] Combat timer tracking working correctly
+- [ ] Regeneration activates after 60 seconds out of combat
+- [ ] Regeneration rate scales with tier
+- [ ] Combat interruption works correctly
+- [ ] No conflicts with GuardRetreatGoal
+- [ ] Performance tested with multiple guards
+- [ ] Manual in-game testing completed
+- [ ] User validation PASSED
 
 ---
 

@@ -175,6 +175,7 @@ public abstract class VillagerAIMixin extends MerchantEntity implements com.xeen
     private void removeGuardGoals() {
         // Remove guard-specific goals
         this.goalSelector.getGoals().removeIf(goal ->
+            goal.getGoal() instanceof com.xeenaa.villagermanager.ai.GuardDirectAttackGoal ||
             goal.getGoal() instanceof GuardDefendVillageGoal ||
             goal.getGoal() instanceof GuardMeleeAttackGoal ||
             goal.getGoal() instanceof GuardRangedAttackGoal ||

@@ -152,6 +152,27 @@ public class GuardDirectAttackGoal extends Goal {
     public void start() {
         guard.setTarget(this.target);
 
+        // Count how many GuardDirectAttackGoal instances are active on this guard
+        try {
+            java.lang.reflect.Field goalSelectorField = net.minecraft.entity.mob.MobEntity.class.getDeclaredField("goalSelector");
+            goalSelectorField.setAccessible(true);
+            net.minecraft.entity.ai.goal.GoalSelector goalSelector = (net.minecraft.entity.ai.goal.GoalSelector) goalSelectorField.get(guard);
+
+            long attackGoalCount = goalSelector.getGoals().stream()
+                .filter(goal -> goal.getGoal() instanceof GuardDirectAttackGoal)
+                .count();
+
+            if (attackGoalCount > 1) {
+                XeenaaVillagerManager.LOGGER.warn("[DUPLICATE GOALS] Guard {} has {} GuardDirectAttackGoal instances! Should only have 1!",
+                    guard.getUuid(), attackGoalCount);
+            } else {
+                XeenaaVillagerManager.LOGGER.info("[COMBAT START] Guard {} starting combat with {} GuardDirectAttackGoal instances",
+                    guard.getUuid(), attackGoalCount);
+            }
+        } catch (Exception e) {
+            XeenaaVillagerManager.LOGGER.error("Failed to count GuardDirectAttackGoal instances", e);
+        }
+
         // Notify scheduler that guard entered combat for increased update frequency
         if (guard.getWorld() instanceof ServerWorld serverWorld) {
             GuardAIScheduler scheduler = GuardAIScheduler.get(serverWorld);
@@ -172,6 +193,9 @@ public class GuardDirectAttackGoal extends Goal {
         }
     }
 
+    // Debug counter for logging tick() calls
+    private int tickCounter = 0;
+
     @Override
     public void tick() {
         if (this.target == null) {
@@ -181,7 +205,13 @@ public class GuardDirectAttackGoal extends Goal {
         // Update cooldowns
         if (attackCooldown > 0) {
             attackCooldown--;
+            // Log cooldown decrement every 5 ticks to track if tick() is actually being called
+            if (tickCounter % 5 == 0) {
+                XeenaaVillagerManager.LOGGER.info("[TICK DEBUG] Cooldown: {} -> {} (decrementing)",
+                    attackCooldown + 1, attackCooldown);
+            }
         }
+        tickCounter++;
 
         // Look at target
         guard.getLookControl().lookAt(target, 30.0f, 30.0f);
@@ -221,7 +251,10 @@ public class GuardDirectAttackGoal extends Goal {
             // Shoot if in range and cooldown ready
             if (actualDistance >= 4.0 && actualDistance <= 16.0 && attackCooldown <= 0) {
                 performRangedAttack();
-                attackCooldown = 30; // 1.5 second cooldown for bows
+                // Tier-based ranged attack cooldown (balanced with Skeleton)
+                GuardData rangedGuardData = GuardDataManager.get(guard.getWorld()).getGuardData(guard.getUuid());
+                int rangedTier = rangedGuardData != null ? rangedGuardData.getRankData().getCurrentTier() : 0;
+                attackCooldown = getRangedAttackCooldown(rangedTier);
             }
         } else {
             // Melee combat - close distance and attack
@@ -234,7 +267,13 @@ public class GuardDirectAttackGoal extends Goal {
             // Attack if in range and cooldown is ready
             if (actualDistance <= 3.0 && attackCooldown <= 0) {
                 performMeleeAttack();
-                attackCooldown = 20; // 1 second cooldown
+                // Tier-based melee attack cooldown (balanced with Zombie)
+                GuardData meleeGuardData = GuardDataManager.get(guard.getWorld()).getGuardData(guard.getUuid());
+                int meleeTier = meleeGuardData != null ? meleeGuardData.getRankData().getCurrentTier() : 0;
+                int newCooldown = getMeleeAttackCooldown(meleeTier);
+                attackCooldown = newCooldown;
+                XeenaaVillagerManager.LOGGER.info("[MELEE COOLDOWN SET] Tier {} - Set cooldown to {} ticks ({} seconds)",
+                    meleeTier, newCooldown, newCooldown / 20.0);
             }
         }
     }
@@ -243,6 +282,20 @@ public class GuardDirectAttackGoal extends Goal {
         if (this.target == null) {
             return;
         }
+
+        // Get guard tier for logging
+        GuardData logGuardData = GuardDataManager.get(guard.getWorld()).getGuardData(guard.getUuid());
+        int guardTier = logGuardData != null ? logGuardData.getRankData().getCurrentTier() : 0;
+
+        // Log melee attack with timing info
+        XeenaaVillagerManager.LOGGER.info("[MELEE ATTACK] Guard Tier {} attacking {} | Guard Health: {}/{} | Target Health: {}/{} | Cooldown was: {} ticks",
+            guardTier,
+            target.getName().getString(),
+            guard.getHealth(),
+            guard.getMaxHealth(),
+            target.getHealth(),
+            target.getMaxHealth(),
+            attackCooldown);
 
         // Swing hand animation - must be synced to clients via EntityAnimationS2CPacket
         guard.swingHand(net.minecraft.util.Hand.MAIN_HAND);
@@ -261,11 +314,18 @@ public class GuardDirectAttackGoal extends Goal {
         // Audio effect: Weapon swing sound
         CombatEffects.playMeleeSwingSound(guard.getWorld(), guard.getPos(), guard.getSoundCategory());
 
-        // Calculate damage - villagers don't have attack damage attribute by default, so start with 1.0
-        float baseDamage = 1.0f;
-        if (guard.getAttributeInstance(net.minecraft.entity.attribute.EntityAttributes.GENERIC_ATTACK_DAMAGE) != null) {
-            baseDamage = (float) guard.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.GENERIC_ATTACK_DAMAGE);
-        }
+        // Get guard tier for damage scaling
+        GuardData damageGuardData = GuardDataManager.get(guard.getWorld()).getGuardData(guard.getUuid());
+        int damageTier = damageGuardData != null ? damageGuardData.getRankData().getCurrentTier() : 0;
+
+        // Tier-based base melee damage (WITHOUT weapon)
+        // Goal: Make Tier 0-1 LOSE to zombies in 1v1
+        // Tier 0: 0.15 base (with Iron Sword 5.0 = 5.15 total, DPS = 2.94)
+        // Tier 1: 0.25 base (5.25 total, DPS = 3.28)
+        // Tier 2: 0.5 base (5.5 total, DPS = 3.93)
+        // Tier 3: 0.75 base (5.75 total, DPS = 4.79)
+        // Tier 4: 1.2 base (6.2 total, DPS = 6.2)
+        float baseDamage = 0.15f + (damageTier * 0.15f) + (damageTier >= 2 ? (damageTier - 1) * 0.1f : 0);
 
         // Add weapon damage
         net.minecraft.item.ItemStack weapon = guard.getEquippedStack(net.minecraft.entity.EquipmentSlot.MAINHAND);
@@ -283,6 +343,14 @@ public class GuardDirectAttackGoal extends Goal {
         // Deal damage
         net.minecraft.entity.damage.DamageSource damageSource = guard.getDamageSources().mobAttack(guard);
         boolean damaged = target.damage(damageSource, baseDamage);
+
+        // Log damage dealt
+        XeenaaVillagerManager.LOGGER.info("[MELEE DAMAGE] Dealt {} damage to {} | Hit: {} | Target remaining health: {}/{}",
+            baseDamage,
+            target.getName().getString(),
+            damaged,
+            target.getHealth(),
+            target.getMaxHealth());
 
         if (damaged) {
             // Apply knockback
@@ -336,11 +404,23 @@ public class GuardDirectAttackGoal extends Goal {
         double dz = target.getZ() - arrowZ;
         double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
 
-        // Set velocity (similar to skeleton shooting)
-        arrow.setVelocity(dx, dy + horizontalDistance * 0.20000000298023224, dz, 1.6f, 14.0f - (guard.getWorld().getDifficulty().getId() * 4.0f));
+        // Get tier for velocity and damage calculations
+        GuardData arrowGuardData = GuardDataManager.get(guard.getWorld()).getGuardData(guard.getUuid());
+        int arrowTier = arrowGuardData != null ? arrowGuardData.getRankData().getCurrentTier() : 0;
 
-        // Set damage
-        arrow.setDamage(2.0 + (guard.getWorld().getDifficulty().getId() * 0.5));
+        // Set velocity with tier-based scaling
+        // Tier 0: 2.2 velocity, Tier 1: 2.4, Tier 2: 2.6, Tier 3: 2.8, Tier 4: 3.0
+        float velocity = 2.2f + (arrowTier * 0.2f);
+        arrow.setVelocity(dx, dy + horizontalDistance * 0.20000000298023224, dz, velocity, 14.0f - (guard.getWorld().getDifficulty().getId() * 4.0f));
+
+        // Set damage with tier-based scaling for balance
+        // Reduced base damage to compensate for superior AI and tactics
+        // Tier 0 Normal: 2.5 (significantly lower than Skeleton 3.5)
+        // Tier 1 Normal: 2.8
+        // Tier 4 Normal: 3.7 (approaching Pillager 4.0)
+        double baseDamage = 2.0 + (arrowTier * 0.3); // Tier scaling: 2.0 → 3.2
+        double difficultyBonus = guard.getWorld().getDifficulty().getId() * 0.5;
+        arrow.setDamage(baseDamage + difficultyBonus);
 
         // Audio effect: Bow shoot sound
         guard.getWorld().playSound(null, guard.getX(), guard.getY(), guard.getZ(),
@@ -353,6 +433,39 @@ public class GuardDirectAttackGoal extends Goal {
         // Clear "using item" state after a short delay (bow release animation)
         // This happens automatically when the item use finishes, but we clear it manually
         guard.clearActiveItem();
+    }
+
+    /**
+     * Gets the ranged attack cooldown based on guard tier.
+     * Balanced against Pillager (3.5s) and Skeleton (2.0s).
+     *
+     * @param tier The guard's current tier (0-4)
+     * @return Attack cooldown in ticks
+     */
+    private int getRangedAttackCooldown(int tier) {
+        // Tier 0: 70 ticks (3.5s) - matches Pillager speed
+        // Tier 1: 65 ticks (3.25s) - still slower than Pillager
+        // Tier 2: 55 ticks (2.75s) - faster than Pillager
+        // Tier 3: 45 ticks (2.25s) - approaching Skeleton speed
+        // Tier 4: 40 ticks (2.0s) - matches Skeleton speed
+        return Math.max(40, 70 - (tier * 7));
+    }
+
+    /**
+     * Gets the melee attack cooldown based on guard tier.
+     * Balanced against Zombie (1.0s attack speed).
+     *
+     * @param tier The guard's current tier (0-4)
+     * @return Attack cooldown in ticks
+     */
+    private int getMeleeAttackCooldown(int tier) {
+        // COMPENSATING for accelerated tick rate (~32 ticks/second instead of 20)
+        // Tier 0: 60 ticks (~1.875s actual) - significantly slower than Zombie (1.0s)
+        // Tier 1: 54 ticks (~1.69s actual) - still much slower than Zombie
+        // Tier 2: 48 ticks (~1.5s actual) - slower than Zombie
+        // Tier 3: 40 ticks (~1.25s actual) - approaching Zombie speed
+        // Tier 4: 32 ticks (~1.0s actual) - matches Zombie
+        return Math.max(32, 60 - (tier * 6));
     }
 
     @Override

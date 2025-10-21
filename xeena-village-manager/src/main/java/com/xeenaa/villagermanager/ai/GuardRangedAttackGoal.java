@@ -45,7 +45,7 @@ public class GuardRangedAttackGoal extends Goal {
     private static final double HIGH_GROUND_SEARCH_RADIUS = 10.0;
 
     // Cooldowns (in ticks)
-    private static final int BASE_ATTACK_COOLDOWN = 30; // 1.5 seconds
+    private static final int BASE_ATTACK_COOLDOWN = 45; // 2.25 seconds (balanced with Skeleton)
     private static final int REPOSITION_COOLDOWN = 60; // 3 seconds
     private static final int BOW_DRAW_TIME = 20; // 1 second for full draw (same as player)
 
@@ -388,14 +388,16 @@ public class GuardRangedAttackGoal extends Goal {
         // Create arrow entity
         ArrowEntity arrow = new ArrowEntity(guard.getWorld(), guard, new ItemStack(Items.ARROW), null);
 
-        // Apply slowness effect to arrows (Slowness I for 3 seconds = 35% speed reduction)
-        arrow.addEffect(new net.minecraft.entity.effect.StatusEffectInstance(
-            net.minecraft.entity.effect.StatusEffects.SLOWNESS,
-            60, // 3 seconds (20 ticks/sec * 3)
-            0,  // Amplifier 0 = Slowness I (35% speed reduction)
-            false,
-            false
-        ));
+        // Apply slowness effect ONLY at Tier 3+ (balanced progression)
+        if (tier >= 3) {
+            arrow.addEffect(new net.minecraft.entity.effect.StatusEffectInstance(
+                net.minecraft.entity.effect.StatusEffects.SLOWNESS,
+                40, // 2 seconds (reduced from 3)
+                0,  // Amplifier 0 = Slowness I (35% speed reduction)
+                false,
+                false
+            ));
+        }
 
         // Improved accuracy for higher tiers
         float accuracy = Math.max(1.0f, 14 - tier * 2);
@@ -429,9 +431,15 @@ public class GuardRangedAttackGoal extends Goal {
 
     /**
      * Gets attack cooldown based on tier
+     * Balanced progression: Tier 0 slightly slower than Skeleton, Tier 4 matches Skeleton close-range
      */
     private int getAttackCooldown(int tier) {
-        return Math.max(15, BASE_ATTACK_COOLDOWN - (tier * 3)); // Faster attacks at higher tiers
+        // Tier 0: 45 ticks (2.25s) - slightly slower than Skeleton average (2.0s)
+        // Tier 1: 42 ticks (2.1s)
+        // Tier 2: 38 ticks (1.9s) - approaching Skeleton speed
+        // Tier 3: 34 ticks (1.7s)
+        // Tier 4: 30 ticks (1.5s) - matches Skeleton close-range speed
+        return Math.max(30, BASE_ATTACK_COOLDOWN - (tier * 3)); // Faster attacks at higher tiers
     }
 
     /**

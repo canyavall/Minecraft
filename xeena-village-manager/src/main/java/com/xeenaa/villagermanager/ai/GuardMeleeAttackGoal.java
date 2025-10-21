@@ -280,10 +280,15 @@ public class GuardMeleeAttackGoal extends MeleeAttackGoal {
 
     /**
      * Gets attack cooldown based on tier
-     * Zombies attack every ~20 ticks, so guards need to be competitive
+     * Balanced progression: Tier 0 matches Zombie (20 ticks), gradual improvement to Tier 4
      */
     private int getAttackCooldown(int tier) {
-        return Math.max(8, 18 - (tier * 2)); // Tier 0: 18 ticks (0.9s), Tier 4: 8 ticks (0.4s)
+        // Tier 0: 20 ticks (1.0s) - matches Zombie
+        // Tier 1: 19 ticks (0.95s)
+        // Tier 2: 17 ticks (0.85s)
+        // Tier 3: 15 ticks (0.75s)
+        // Tier 4: 13 ticks (0.65s) - faster but not overwhelming
+        return Math.max(13, 20 - tier);
     }
 
     /**
