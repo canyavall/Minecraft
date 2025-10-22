@@ -19,18 +19,24 @@
 
 **Status**: 🔄 IN PROGRESS
 **Start Date**: October 19, 2025
-**Current Phase**: Phase 1 - Testing & Configuration Cleanup (COMPLETED ✅)
-**Progress**: 29% (4 of 14 tasks completed)
+**Current Phase**: Phase 2 - Player Binding/Ownership System
+**Progress**: 50% (7 of 14 tasks completed)
 
 #### Phase 1: COMPLETED ✅ (100%)
 - ✅ **P4-TASK-001**: Test All Guard Modes (October 19, 2025) - All modes working perfectly
 - ✅ **P4-TASK-002**: Test Patrol Radius System (October 19, 2025) - Radius and pathfinding validated
 - ✅ **P4-TASK-003**: Config File Audit & Cleanup (October 19, 2025) - Removed 9 unused settings, added documentation
 - ✅ **P4-TASK-003.1**: Guard Combat Balance (October 19, 2025) - Critical balance issues fixed, all tests passing
+- ✅ **P4-TASK-003.5**: Implement Passive Guard Health Regeneration (October 22, 2025) - Tier-scaled passive healing validated with 28 guards ✅
 
-#### Next Phase: Phase 2 - Player Binding/Ownership System
+#### Phase 2: Player Binding/Ownership System (IN PROGRESS)
+- ✅ **P4-TASK-004**: Design Ownership Data Model (October 22, 2025) - 3 classes + 95+ tests, persistence ready
+- ✅ **P4-TASK-005**: Implement Ownership Binding & Unbinding (October 22, 2025) - 7 packets/handlers, GUI with Claim/Release buttons - VALIDATED ✅
+- ✅ **P4-TASK-005.1**: Fix Ownership Persistence on Server Restart (October 22, 2025) - InitialOwnershipSyncPacket added - VALIDATED ✅
+- ✅ **P4-TASK-005.2**: Fix Ownership Test Suite (October 22, 2025) - MinecraftTestBase created, 97.4% test pass rate (75/77)
+
 #### Current Task:
-- 📋 **P4-TASK-004**: Design Ownership Data Model (TODO - ready to start)
+- 📋 **P4-TASK-006**: Implement Permission System (TODO - next task)
 
 #### Phase Breakdown:
 - **Phase 1**: Testing & Configuration Cleanup (3 tasks - 5-7 hours)

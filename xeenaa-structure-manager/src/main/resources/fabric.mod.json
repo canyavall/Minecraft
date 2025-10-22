@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "xeenaa-structure-manager",
+  "version": "${version}",
+  "name": "Xeenaa Structure Manager",
+  "description": "Manages structure spawning across multiple mods/datapacks with configurable density, distance, and type-based organization to reduce world clutter and enhance performance",
+  "authors": [
+    "Canya"
+  ],
+  "contact": {
+    "homepage": "https://github.com/canya/xeenaa-structure-manager",
+    "sources": "https://github.com/canya/xeenaa-structure-manager"
+  },
+  "license": "MIT",
+  "icon": "assets/xeenaa-structure-manager/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.canya.xeenaa_structure_manager.StructureManagerMod"
+    ],
+    "client": [
+      "com.canya.xeenaa_structure_manager.client.StructureManagerClient"
+    ]
+  },
+  "mixins": [
+    "xeenaa-structure-manager.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}

@@ -2,11 +2,16 @@ package com.xeenaa.villagermanager;
 
 import com.xeenaa.villagermanager.client.model.SimplifiedVillagerModel;
 import com.xeenaa.villagermanager.client.network.GuardDataSyncHandler;
+import com.xeenaa.villagermanager.client.network.ownership.ClientOwnershipPacketHandler;
 import com.xeenaa.villagermanager.client.render.VillagerRendererFactory;
 import com.xeenaa.villagermanager.client.util.ClientInteractionHandler;
+import com.xeenaa.villagermanager.network.ownership.InitialOwnershipSyncPacket;
+import com.xeenaa.villagermanager.network.ownership.OwnershipSyncPacket;
+import com.xeenaa.villagermanager.network.ownership.OwnershipDeniedPacket;
 import com.xeenaa.villagermanager.profession.ModProfessions;
 import com.xeenaa.villagermanager.registry.ProfessionManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -52,6 +57,14 @@ public class XeenaaVillagerManagerClient implements ClientModInitializer {
         // Register client-side packet handlers
         GuardDataSyncHandler.register();
 
-        CLIENT_LOGGER.info("Client-side villager interaction handler and conditional rendering system registered");
+        // Register ownership packet handlers
+        ClientPlayNetworking.registerGlobalReceiver(
+            InitialOwnershipSyncPacket.ID, ClientOwnershipPacketHandler::handleInitialSync);
+        ClientPlayNetworking.registerGlobalReceiver(
+            OwnershipSyncPacket.ID, ClientOwnershipPacketHandler::handleSync);
+        ClientPlayNetworking.registerGlobalReceiver(
+            OwnershipDeniedPacket.ID, ClientOwnershipPacketHandler::handleDenied);
+
+        CLIENT_LOGGER.info("Client-side villager interaction handler, conditional rendering system, and ownership packet handlers (initial + sync + denied) registered");
     }
 }

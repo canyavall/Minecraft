@@ -43,6 +43,10 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+
+	// Mockito for mocking in tests
+	testImplementation 'org.mockito:mockito-core:5.8.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
 }
 
 processResources {
@@ -64,6 +68,12 @@ test {
 		exceptionFormat "full"
 		showStandardStreams = true
 	}
+
+	// CRITICAL: Disable Minecraft bootstrap requirement for unit tests
+	// Minecraft's registry system requires Fabric loader environment which is not available in unit tests
+	// We use Mockito to mock Minecraft classes without actually instantiating them
+	systemProperty 'fabric-api.gametest', 'true'
+	systemProperty 'net.minecraft.bootstrap.disabled', 'true'
 }
 
 java {

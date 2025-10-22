@@ -168,6 +168,10 @@ public abstract class VillagerAIMixin extends MerchantEntity implements com.xeen
         this.goalSelector.add(8, new com.xeenaa.villagermanager.ai.GuardStandGoal(self));
         System.out.println("GUARD AI: Added GuardStandGoal");
 
+        // Priority 10: Very low priority - passive health regeneration when out of combat
+        this.goalSelector.add(10, new com.xeenaa.villagermanager.ai.GuardPassiveRegenerationGoal(self));
+        System.out.println("GUARD AI: Added GuardPassiveRegenerationGoal");
+
         System.out.println("GUARD AI: Initialization complete for " + self.getUuid());
     }
 
@@ -182,7 +186,8 @@ public abstract class VillagerAIMixin extends MerchantEntity implements com.xeen
             goal.getGoal() instanceof GuardFollowVillagerGoal ||
             goal.getGoal() instanceof GuardPatrolGoal ||
             goal.getGoal() instanceof com.xeenaa.villagermanager.ai.GuardRetreatGoal ||
-            goal.getGoal() instanceof com.xeenaa.villagermanager.ai.GuardStandGoal
+            goal.getGoal() instanceof com.xeenaa.villagermanager.ai.GuardStandGoal ||
+            goal.getGoal() instanceof com.xeenaa.villagermanager.ai.GuardPassiveRegenerationGoal
         );
 
         this.targetSelector.getGoals().removeIf(goal ->

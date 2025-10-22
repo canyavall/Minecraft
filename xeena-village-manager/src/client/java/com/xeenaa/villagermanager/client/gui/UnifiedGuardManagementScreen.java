@@ -2,6 +2,7 @@ package com.xeenaa.villagermanager.client.gui;
 
 import com.xeenaa.villagermanager.XeenaaVillagerManager;
 import com.xeenaa.villagermanager.client.data.ClientGuardDataCache;
+import com.xeenaa.villagermanager.client.network.ownership.ClientOwnershipCache;
 import com.xeenaa.villagermanager.config.GuardBehaviorConfig;
 import com.xeenaa.villagermanager.config.GuardMode;
 import com.xeenaa.villagermanager.config.ModConfig;
@@ -12,6 +13,8 @@ import com.xeenaa.villagermanager.network.GuardConfigPacket;
 import com.xeenaa.villagermanager.network.GuardProfessionChangePacket;
 import com.xeenaa.villagermanager.network.PurchaseRankPacket;
 import com.xeenaa.villagermanager.network.SelectProfessionPacket;
+import com.xeenaa.villagermanager.network.ownership.BindVillagerPacket;
+import com.xeenaa.villagermanager.network.ownership.UnbindVillagerPacket;
 import com.xeenaa.villagermanager.profession.ModProfessions;
 import com.xeenaa.villagermanager.registry.ProfessionData;
 import com.xeenaa.villagermanager.registry.ProfessionManager;
@@ -31,6 +34,7 @@ import net.minecraft.village.VillagerProfession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Unified single-screen interface for villager/guard management.
@@ -75,10 +79,17 @@ public class UnifiedGuardManagementScreen extends Screen {
     private ButtonWidget guardModeButton;
     private ButtonWidget saveConfigButton;
 
+    // Ownership buttons
+    private ButtonWidget claimVillagerButton;
+    private ButtonWidget releaseOwnershipButton;
+
     // Confirmation dialog state
     private boolean showingConfirmDialog = false;
     private Identifier pendingProfessionId = null;
     private String pendingProfessionName = null;
+
+    // Release confirmation dialog state
+    private boolean showingReleaseConfirmDialog = false;
 
     // Confirmation dialog buttons
     private ButtonWidget confirmButton;
@@ -231,6 +242,9 @@ public class UnifiedGuardManagementScreen extends Screen {
     }
 
     private void createControlButtons() {
+        // Ownership buttons (top of right panel)
+        createOwnershipButtons();
+
         // Lock Profession button (bottom of left panel)
         int lockButtonY = frameY + FRAME_HEIGHT - 40;
         boolean isLocked = guardData != null && guardData.getBehaviorConfig().professionLocked();
@@ -336,6 +350,9 @@ public class UnifiedGuardManagementScreen extends Screen {
             button.render(context, mouseX, mouseY, delta);
         }
 
+        // Render owner badge (top-right of right panel)
+        renderOwnerBadge(context);
+
         // Render right panel content
         if (guardData != null) {
             renderGuardInfo(context);
@@ -346,9 +363,12 @@ public class UnifiedGuardManagementScreen extends Screen {
         // Render all widgets (buttons)
         super.render(context, mouseX, mouseY, delta);
 
-        // Render confirmation dialog LAST (on top of everything)
+        // Render confirmation dialogs LAST (on top of everything)
         if (showingConfirmDialog) {
             renderConfirmationDialog(context, mouseX, mouseY, delta);
+        }
+        if (showingReleaseConfirmDialog) {
+            renderReleaseConfirmationDialog(context, mouseX, mouseY, delta);
         }
     }
 
@@ -765,7 +785,7 @@ public class UnifiedGuardManagementScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Handle ESC key when dialog is showing
+        // Handle ESC key when dialogs are showing
         if (showingConfirmDialog && keyCode == 256) { // GLFW.GLFW_KEY_ESCAPE = 256
             XeenaaVillagerManager.LOGGER.info("User pressed ESC to cancel Guard profession change");
             closeConfirmDialog();
@@ -774,13 +794,35 @@ public class UnifiedGuardManagementScreen extends Screen {
             return true;
         }
 
+        if (showingReleaseConfirmDialog && keyCode == 256) { // GLFW.GLFW_KEY_ESCAPE = 256
+            XeenaaVillagerManager.LOGGER.info("User pressed ESC to cancel release ownership");
+            closeReleaseConfirmDialog();
+            return true;
+        }
+
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Handle dialog button clicks when dialog is showing
+        // Handle profession change dialog button clicks
         if (showingConfirmDialog) {
+            if (confirmButton != null) {
+                if (confirmButton.mouseClicked(mouseX, mouseY, button)) {
+                    return true;
+                }
+            }
+            if (cancelButton != null) {
+                if (cancelButton.mouseClicked(mouseX, mouseY, button)) {
+                    return true;
+                }
+            }
+            // Block all other clicks when dialog is showing
+            return true;
+        }
+
+        // Handle release ownership dialog button clicks
+        if (showingReleaseConfirmDialog) {
             if (confirmButton != null) {
                 if (confirmButton.mouseClicked(mouseX, mouseY, button)) {
                     return true;
@@ -801,5 +843,218 @@ public class UnifiedGuardManagementScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
+    }
+
+    /**
+     * Creates ownership-related UI buttons (Claim/Release).
+     *
+     * <p>Button visibility depends on ownership status:</p>
+     * <ul>
+     *   <li>Unowned villager: Shows "Claim Villager" button</li>
+     *   <li>Owned by player: Shows "Release Ownership" button</li>
+     *   <li>Owned by other: Shows owner badge only, no buttons</li>
+     * </ul>
+     */
+    private void createOwnershipButtons() {
+        ClientOwnershipCache ownershipCache = ClientOwnershipCache.getInstance();
+        UUID villagerUUID = targetVillager.getUuid();
+        UUID localPlayerUUID = client != null && client.player != null ? client.player.getUuid() : null;
+
+        boolean isOwned = ownershipCache.hasOwner(villagerUUID);
+        UUID ownerUUID = ownershipCache.getOwnerUUID(villagerUUID);
+        boolean isOwnedByPlayer = isOwned && localPlayerUUID != null && localPlayerUUID.equals(ownerUUID);
+
+        int buttonY = rightPanelY + 40;
+        int buttonWidth = 120;
+
+        if (!isOwned) {
+            // Show "Claim Villager" button for unowned villagers
+            claimVillagerButton = ButtonWidget.builder(
+                Text.literal("Claim Villager").styled(style -> style.withColor(0x00FF00)),
+                button -> handleClaimVillager()
+            ).dimensions(rightPanelX + 10, buttonY, buttonWidth, 20).build();
+
+            addDrawableChild(claimVillagerButton);
+        } else if (isOwnedByPlayer) {
+            // Show "Release Ownership" button for villagers owned by the player
+            releaseOwnershipButton = ButtonWidget.builder(
+                Text.literal("Release Ownership").styled(style -> style.withColor(0xFF4444)),
+                button -> showReleaseConfirmation()
+            ).dimensions(rightPanelX + 10, buttonY, buttonWidth, 20).build();
+
+            addDrawableChild(releaseOwnershipButton);
+        }
+        // If owned by another player, no buttons shown (just display owner badge in render)
+    }
+
+    /**
+     * Handles the "Claim Villager" button click.
+     *
+     * <p>Sends a {@link BindVillagerPacket} to the server to request ownership.</p>
+     */
+    private void handleClaimVillager() {
+        XeenaaVillagerManager.LOGGER.info("Player requesting to claim villager {}", targetVillager.getUuid());
+
+        BindVillagerPacket packet = new BindVillagerPacket(targetVillager.getId());
+        ClientPlayNetworking.send(packet);
+
+        // Refresh screen after short delay to reflect changes
+        MinecraftClient.getInstance().execute(() -> {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(300);
+                    MinecraftClient.getInstance().execute(() -> {
+                        this.clearAndInit();
+                    });
+                } catch (InterruptedException e) {
+                    // Ignore interruption
+                }
+            }).start();
+        });
+    }
+
+    /**
+     * Shows the release ownership confirmation dialog.
+     */
+    private void showReleaseConfirmation() {
+        XeenaaVillagerManager.LOGGER.info("Showing release ownership confirmation dialog");
+        this.showingReleaseConfirmDialog = true;
+        initReleaseConfirmDialog();
+    }
+
+    /**
+     * Handles the confirmed release of villager ownership.
+     *
+     * <p>Sends an {@link UnbindVillagerPacket} to the server to release ownership.</p>
+     */
+    private void handleReleaseOwnership() {
+        XeenaaVillagerManager.LOGGER.info("Player releasing ownership of villager {}", targetVillager.getUuid());
+
+        UnbindVillagerPacket packet = new UnbindVillagerPacket(targetVillager.getId());
+        ClientPlayNetworking.send(packet);
+
+        closeReleaseConfirmDialog();
+
+        // Refresh screen after short delay to reflect changes
+        MinecraftClient.getInstance().execute(() -> {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(300);
+                    MinecraftClient.getInstance().execute(() -> {
+                        this.clearAndInit();
+                    });
+                } catch (InterruptedException e) {
+                    // Ignore interruption
+                }
+            }).start();
+        });
+    }
+
+    /**
+     * Initializes the release ownership confirmation dialog buttons.
+     */
+    private void initReleaseConfirmDialog() {
+        int dialogWidth = 300;
+        int dialogHeight = 120;
+        int dialogX = (this.width - dialogWidth) / 2;
+        int dialogY = (this.height - dialogHeight) / 2;
+
+        int buttonWidth = 80;
+        int buttonHeight = 20;
+        int buttonY = dialogY + 80;
+
+        // Confirm button (left side)
+        confirmButton = ButtonWidget.builder(Text.literal("Confirm"), button -> {
+            XeenaaVillagerManager.LOGGER.info("User confirmed release ownership");
+            handleReleaseOwnership();
+        })
+        .dimensions(dialogX + 50, buttonY, buttonWidth, buttonHeight)
+        .build();
+
+        // Cancel button (right side)
+        cancelButton = ButtonWidget.builder(Text.literal("Cancel"), button -> {
+            XeenaaVillagerManager.LOGGER.info("User cancelled release ownership");
+            closeReleaseConfirmDialog();
+        })
+        .dimensions(dialogX + 170, buttonY, buttonWidth, buttonHeight)
+        .build();
+    }
+
+    /**
+     * Closes the release ownership confirmation dialog.
+     */
+    private void closeReleaseConfirmDialog() {
+        this.showingReleaseConfirmDialog = false;
+        confirmButton = null;
+        cancelButton = null;
+        XeenaaVillagerManager.LOGGER.debug("Release confirmation dialog closed");
+    }
+
+    /**
+     * Renders the release ownership confirmation dialog.
+     */
+    private void renderReleaseConfirmationDialog(DrawContext context, int mouseX, int mouseY, float delta) {
+        // 1. Draw semi-transparent overlay
+        context.fill(0, 0, this.width, this.height, 0xCC000000);
+
+        // 2. Calculate dialog position (centered)
+        int dialogWidth = 300;
+        int dialogHeight = 120;
+        int dialogX = (this.width - dialogWidth) / 2;
+        int dialogY = (this.height - dialogHeight) / 2;
+
+        // 3. Draw dialog background and border
+        context.fill(dialogX, dialogY, dialogX + dialogWidth, dialogY + dialogHeight, 0xFF2C2C2C);
+        context.drawBorder(dialogX, dialogY, dialogWidth, dialogHeight, 0xFFFFFFFF);
+
+        // 4. Draw title
+        Text title = Text.literal("Release Ownership?").styled(style -> style.withBold(true));
+        int titleWidth = textRenderer.getWidth(title);
+        context.drawText(textRenderer, title,
+            dialogX + (dialogWidth - titleWidth) / 2, dialogY + 10, 0xFFFFFF, true);
+
+        // 5. Draw warning message
+        Text warning = Text.literal("Are you sure you want to release");
+        Text warning2 = Text.literal("ownership of this villager?");
+        context.drawText(textRenderer, warning, dialogX + 20, dialogY + 35, 0xFFAA00, false);
+        context.drawText(textRenderer, warning2, dialogX + 20, dialogY + 50, 0xFFAA00, false);
+
+        // 6. Render buttons
+        if (confirmButton != null) {
+            confirmButton.render(context, mouseX, mouseY, delta);
+        }
+        if (cancelButton != null) {
+            cancelButton.render(context, mouseX, mouseY, delta);
+        }
+    }
+
+    /**
+     * Renders the owner badge in the right panel header.
+     *
+     * <p>Displays owner information:</p>
+     * <ul>
+     *   <li>Owner name with player head icon (if owned)</li>
+     *   <li>"Unowned" text (if not owned)</li>
+     * </ul>
+     */
+    private void renderOwnerBadge(DrawContext context) {
+        ClientOwnershipCache ownershipCache = ClientOwnershipCache.getInstance();
+        UUID villagerUUID = targetVillager.getUuid();
+
+        String ownerName = ownershipCache.getOwnerName(villagerUUID);
+        boolean isOwned = ownerName != null;
+
+        int badgeX = rightPanelX + RIGHT_PANEL_WIDTH - 150;
+        int badgeY = rightPanelY + 10;
+
+        if (isOwned) {
+            // Draw owner badge with name
+            Text ownerText = Text.literal("Owner: " + ownerName).styled(style -> style.withColor(0xFFD700));
+            context.drawText(textRenderer, ownerText, badgeX, badgeY, 0xFFD700, true);
+        } else {
+            // Draw "Unowned" badge
+            Text unownedText = Text.literal("Unowned").styled(style -> style.withColor(0xAAAAAA));
+            context.drawText(textRenderer, unownedText, badgeX, badgeY, 0xAAAAAA, true);
+        }
     }
 }

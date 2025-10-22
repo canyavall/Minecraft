@@ -15,6 +15,12 @@ import com.xeenaa.villagermanager.network.GuardConfigPacket;
 import com.xeenaa.villagermanager.network.GuardConfigSyncPacket;
 import com.xeenaa.villagermanager.network.PlayerJoinHandler;
 import com.xeenaa.villagermanager.network.ServerPacketHandler;
+import com.xeenaa.villagermanager.network.ownership.BindVillagerPacket;
+import com.xeenaa.villagermanager.network.ownership.UnbindVillagerPacket;
+import com.xeenaa.villagermanager.network.ownership.OwnershipSyncPacket;
+import com.xeenaa.villagermanager.network.ownership.OwnershipDeniedPacket;
+import com.xeenaa.villagermanager.network.ownership.InitialOwnershipSyncPacket;
+import com.xeenaa.villagermanager.network.ownership.OwnershipPacketHandler;
 import com.xeenaa.villagermanager.profession.ModProfessions;
 import com.xeenaa.villagermanager.registry.ProfessionManager;
 import net.fabricmc.api.ModInitializer;
@@ -68,20 +74,33 @@ public class XeenaaVillagerManager implements ModInitializer {
         // Log detailed profession information for testing
         professionManager.logAllProfessions();
 
-        // Register network packets
+        // Register network packets - Client to Server
         PayloadTypeRegistry.playC2S().register(SelectProfessionPacket.PACKET_ID, SelectProfessionPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(PurchaseRankPacket.PACKET_ID, PurchaseRankPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(GuardProfessionChangePacket.PACKET_ID, GuardProfessionChangePacket.CODEC);
         PayloadTypeRegistry.playC2S().register(GuardConfigPacket.PACKET_ID, GuardConfigPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(BindVillagerPacket.ID, BindVillagerPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(UnbindVillagerPacket.ID, UnbindVillagerPacket.CODEC);
+
+        // Register network packets - Server to Client
         PayloadTypeRegistry.playS2C().register(GuardDataSyncPacket.ID, GuardDataSyncPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(GuardEmeraldRefundPacket.PACKET_ID, GuardEmeraldRefundPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(InitialGuardDataSyncPacket.PACKET_ID, InitialGuardDataSyncPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(GuardRankSyncPacket.PACKET_ID, GuardRankSyncPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(RankPurchaseResponsePacket.PACKET_ID, RankPurchaseResponsePacket.CODEC);
         PayloadTypeRegistry.playS2C().register(GuardConfigSyncPacket.PACKET_ID, GuardConfigSyncPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(OwnershipSyncPacket.ID, OwnershipSyncPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(OwnershipDeniedPacket.ID, OwnershipDeniedPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(InitialOwnershipSyncPacket.ID, InitialOwnershipSyncPacket.CODEC);
 
         // Register server-side packet handlers
         ServerPacketHandler.registerHandlers();
+
+        // Register ownership packet handlers
+        net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.registerGlobalReceiver(
+            BindVillagerPacket.ID, OwnershipPacketHandler::handleBind);
+        net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.registerGlobalReceiver(
+            UnbindVillagerPacket.ID, OwnershipPacketHandler::handleUnbind);
 
         // Register player join handler for initial guard data sync
         PlayerJoinHandler.register();
