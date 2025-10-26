@@ -1,0 +1,437 @@
+# Structure Placement Pipeline - Complete Visual Flow
+
+## Legend
+
+┌────┐
+│Box │  = Process/Stage
+└────┘
+
+(Decision) = Decision point
+
+[Data] = Data structure
+
+═══════ = Phase boundary
+─────── = Flow direction
+  ↓     = Sequential flow
+  ├─    = Branch
+  └─    = End of branch
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         PHASE 1: WORLD LOAD (ONE-TIME)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌───────────────────┐
+│  World Creation   │
+│  (User creates    │
+│   new world)      │
+└─────────┬─────────┘
+          │
+          ↓
+┌───────────────────────────────────────────┐
+│     DynamicRegistryManager.load()         │
+│  ────────────────────────────────────────│
+│  Loads all registries from data packs:    │
+│  - Registry<Structure> (569 structures)   │
+│  - Registry<StructureSet> (groups)        │
+│  - Registry<Biome> (all biomes)           │
+└─────────┬─────────────────────────────────┘
+          │
+          ↓
+[569 Structures Globally]
+          │
+          ↓
+┌─────────────────────────────────────────────┐
+│         ChunkGenerator.create()             │
+│  ──────────────────────────────────────────│
+│  Creates generator for dimension            │
+│  - Overworld: NoiseChunkGenerator           │
+│  - Nether: NoiseChunkGenerator              │
+│  - End: EndChunkGenerator                   │
+└─────────┬───────────────────────────────────┘
+          │
+          ↓
+┌──────────────────────────────────────────────────────────────┐
+│    ChunkGenerator.createStructurePlacementCalculator()        │
+│  ───────────────────────────────────────────────────────────│
+│  Step 1: Get biome source for dimension                      │
+│  Step 2: Filter structures by dimension                      │
+│                                                               │
+│  ┌─────────────────────────────────────────────┐            │
+│  │  FILTER: Dimension Compatibility            │            │
+│  │  ────────────────────────────────────────   │            │
+│  │  for structure in allStructures:            │            │
+│  │    if structure.dimension == dimension:     │            │
+│  │      keep(structure)                        │            │
+│  │                                             │            │
+│  │  569 structures → 400 structures ✓          │            │
+│  └─────────────────────────────────────────────┘            │
+│                                                               │
+│  Step 3: Filter by biome source compatibility                │
+│                                                               │
+│  ┌─────────────────────────────────────────────┐            │
+│  │  FILTER: Biome Source Compatibility         │            │
+│  │  ────────────────────────────────────────   │            │
+│  │  for structure in dimensionStructures:      │            │
+│  │    if structure.validBiomes.overlaps(       │            │
+│  │         biomeSource.biomes):                │            │
+│  │      keep(structure)                        │            │
+│  │                                             │            │
+│  │  400 structures → 80-150 structure sets ✓   │            │
+│  └─────────────────────────────────────────────┘            │
+└─────────┬────────────────────────────────────────────────────┘
+          │
+          ↓
+[Stream<RegistryEntry<StructureSet>>]
+[80-150 structure sets]
+          │
+          ↓
+┌──────────────────────────────────────────────────────────────┐
+│   StructurePlacementCalculator.create()                      │
+│   ═══════════════════════════════════════════════════════   │
+│   *** XEENAA MOD MIXIN INTERCEPTS HERE ***                   │
+│  ───────────────────────────────────────────────────────────│
+│                                                               │
+│  ┌─────────────────────────────────────────────┐            │
+│  │  OUR MIXIN: modifyStructureSets()           │            │
+│  │  ────────────────────────────────────────   │            │
+│  │  For each structure set in stream:          │            │
+│  │    1. Classify structure:                   │            │
+│  │       - Size: small/medium/large            │            │
+│  │       - Type: town/dungeon/temple/etc       │            │
+│  │                                             │            │
+│  │    2. Query config for multipliers:         │            │
+│  │       - size.large = 2.5x                   │            │
+│  │       - type.town = 2.0x                    │            │
+│  │       - Global = 1.0x                       │            │
+│  │                                             │            │
+│  │    3. Modify RandomSpreadStructurePlacement:│            │
+│  │       spacing: 32 → 64 (2.0x)               │            │
+│  │       separation: 8 → 16 (2.0x)             │            │
+│  │                                             │            │
+│  │    4. Create new StructureSet with modified │            │
+│  │       placement values                      │            │
+│  │                                             │            │
+│  │  Result: Transformed stream with larger     │            │
+│  │          spacing/separation values ✓        │            │
+│  └─────────────────────────────────────────────┘            │
+│                                                               │
+│  Step 4: Build calculator from modified stream               │
+│                                                               │
+│  ┌─────────────────────────────────────────────┐            │
+│  │  for each structure set:                    │            │
+│  │    Create StructurePlacement instance       │            │
+│  │    Store in calculator map                  │            │
+│  │                                             │            │
+│  │  Result: StructurePlacementCalculator ✓     │            │
+│  └─────────────────────────────────────────────┘            │
+└─────────┬────────────────────────────────────────────────────┘
+          │
+          ↓
+[StructurePlacementCalculator]
+[CACHED for entire dimension lifetime]
+          │
+          ↓
+      (World load complete)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                  PHASE 2: PER-CHUNK STRUCTURE_START (REPEATED)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────┐
+│  Chunk (x, z) enters │
+│  generation pipeline │
+└─────────┬────────────┘
+          │
+          ↓
+┌──────────────────────────────────────┐
+│  Worldgen Stage: STRUCTURE_START     │
+│  (Must complete before other stages) │
+└─────────┬────────────────────────────┘
+          │
+          ↓
+┌────────────────────────────────────────────────────────────────┐
+│          ChunkGenerator.setStructureStarts()                   │
+│  ─────────────────────────────────────────────────────────────│
+│  Query calculator for structures at chunk (x, z)               │
+└─────────┬──────────────────────────────────────────────────────┘
+          │
+          ↓
+┌─────────────────────────────────────────────────────────────────┐
+│   StructurePlacementCalculator.getStructures(ChunkPos)          │
+│  ────────────────────────────────────────────────────────────  │
+│  For each structure set in calculator (80-150 sets):            │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 1: Grid Cell Calculation                     │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  spacing = 64 (after our 2x multiplier)            │        │
+│  │  cellX = floor(chunkX / spacing)                   │        │
+│  │  cellZ = floor(chunkZ / spacing)                   │        │
+│  │                                                     │        │
+│  │  Example: chunk (100, 200), spacing 64             │        │
+│  │    cellX = floor(100/64) = floor(1.56) = 1         │        │
+│  │    cellZ = floor(200/64) = floor(3.12) = 3         │        │
+│  │    Grid cell: (1, 3) ✓                             │        │
+│  └────────────────────────────────────────────────────┘        │
+│                      ↓                                          │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 2: Salt-Based Random Offset                  │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  // Generate deterministic random seed             │        │
+│  │  seed = hash(cellX, cellZ, worldSeed, structureSalt)│        │
+│  │       = (worldSeed +                               │        │
+│  │          cellX * 341873128712 +                    │        │
+│  │          cellZ * 132897987541 +                    │        │
+│  │          structureSalt) & 281474976710655          │        │
+│  │                                                     │        │
+│  │  random = new Random(seed)                         │        │
+│  │                                                     │        │
+│  │  // Calculate offset within cell                   │        │
+│  │  separation = 16 (after our 2x multiplier)         │        │
+│  │  maxOffset = spacing - separation = 64-16 = 48     │        │
+│  │                                                     │        │
+│  │  offsetX = random.nextInt(48) = 22 (example)       │        │
+│  │  offsetZ = random.nextInt(48) = 35 (example)       │        │
+│  │                                                     │        │
+│  │  Offset: (22, 35) ✓                                │        │
+│  └────────────────────────────────────────────────────┘        │
+│                      ↓                                          │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 3: Candidate Chunk Calculation               │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  candidateX = cellX * spacing + offsetX            │        │
+│  │             = 1 * 64 + 22 = 86                     │        │
+│  │                                                     │        │
+│  │  candidateZ = cellZ * spacing + offsetZ            │        │
+│  │             = 3 * 64 + 35 = 227                    │        │
+│  │                                                     │        │
+│  │  Candidate chunk: (86, 227) ✓                      │        │
+│  └────────────────────────────────────────────────────┘        │
+│                      ↓                                          │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 4: Does Chunk Match Candidate?               │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  Current chunk: (100, 200)                         │        │
+│  │  Candidate chunk: (86, 227)                        │        │
+│  │                                                     │        │
+│  │  if (100 == 86 && 200 == 227):                     │        │
+│  │    → NO (doesn't match)                            │        │
+│  │    → SKIP this structure ✗                         │        │
+│  │                                                     │        │
+│  │  [Structure is NOT checked further]                │        │
+│  └────────────────────────────────────────────────────┘        │
+│                                                                  │
+│  Repeat for ALL 80-150 structure sets...                        │
+│                                                                  │
+│  Typical result:                                                │
+│  - 80-150 structure sets checked                                │
+│  - 5-20 structures match grid (candidates)                      │
+│  - Others skipped (not in grid for this chunk)                  │
+└─────────┬────────────────────────────────────────────────────────┘
+          │
+          ↓
+[List of 5-20 grid-matched structures]
+          │
+          ↓
+┌─────────────────────────────────────────────────────────────────┐
+│   For each grid-matched structure (5-20 structures):            │
+│  ────────────────────────────────────────────────────────────  │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 5: Biome Compatibility Check                 │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  1. Get biome at chunk center                      │        │
+│  │     biome = chunk.getBiome(centerBlockPos)         │        │
+│  │                                                     │        │
+│  │  2. Check if structure can spawn in this biome     │        │
+│  │     if structure.validBiomes.contains(biome):      │        │
+│  │       → CONTINUE (biome compatible) ✓              │        │
+│  │     else:                                          │        │
+│  │       → SKIP (wrong biome) ✗                       │        │
+│  │                                                     │        │
+│  │  Example: Plains biome                             │        │
+│  │    Village (plains) → Compatible ✓                 │        │
+│  │    Desert Temple → Not compatible ✗                │        │
+│  │    Ruined Portal → Compatible ✓                    │        │
+│  │                                                     │        │
+│  │  Typical result: 5-20 → 2-10 structures ✓          │        │
+│  └────────────────────────────────────────────────────┘        │
+└─────────┬───────────────────────────────────────────────────────┘
+          │
+          ↓
+[List of 2-10 biome-compatible structures to attempt]
+          │
+          ↓
+┌─────────────────────────────────────────────────────────────────┐
+│   For each compatible structure (2-10 structures):              │
+│  ────────────────────────────────────────────────────────────  │
+│  ┌────────────────────────────────────────────────────┐        │
+│  │  STEP 6: Structure Generation                      │        │
+│  │  ────────────────────────────────────────────────  │        │
+│  │  Structure.createStructureStart()                  │        │
+│  │                                                     │        │
+│  │  For JIGSAW structures (villages, bastions):       │        │
+│  │  ┌──────────────────────────────────────────┐     │        │
+│  │  │ 1. Start with root piece                 │     │        │
+│  │  │ 2. For each jigsaw block in piece:       │     │        │
+│  │  │    - Find compatible child pieces        │     │        │
+│  │  │    - Check bounding box intersection     │     │        │
+│  │  │      with ALL existing pieces (O(n²)!)   │     │        │
+│  │  │    - If fits: Add piece, repeat          │     │        │
+│  │  │ 3. Continue until max depth reached      │     │        │
+│  │  │                                           │     │        │
+│  │  │ Time: 0.1ms - 50ms (depends on size)     │     │        │
+│  │  │ Complexity: O(n²) for n pieces           │     │        │
+│  │  └──────────────────────────────────────────┘     │        │
+│  │                                                     │        │
+│  │  For TEMPLATE structures (temples):                │        │
+│  │  ┌──────────────────────────────────────────┐     │        │
+│  │  │ 1. Load NBT template                     │     │        │
+│  │  │ 2. Validate terrain suitability          │     │        │
+│  │  │ 3. Create StructureStart with 1 piece    │     │        │
+│  │  │                                           │     │        │
+│  │  │ Time: ~0.5ms                             │     │        │
+│  │  │ Complexity: O(1)                         │     │        │
+│  │  └──────────────────────────────────────────┘     │        │
+│  │                                                     │        │
+│  │  Validation checks:                                │        │
+│  │  - Terrain height acceptable?                      │        │
+│  │  - No conflicts with other structures?             │        │
+│  │  - Pieces fit within valid chunk range?            │        │
+│  │                                                     │        │
+│  │  if (validation passes):                           │        │
+│  │    Create StructureStart ✓                         │        │
+│  │  else:                                             │        │
+│  │    Discard (failed validation) ✗                   │        │
+│  │                                                     │        │
+│  │  Typical result: 2-10 → 1-3 successful ✓           │        │
+│  └────────────────────────────────────────────────────┘        │
+└─────────┬───────────────────────────────────────────────────────┘
+          │
+          ↓
+[1-3 StructureStart instances created]
+          │
+          ↓
+┌─────────────────────────────────────────────────────────────────┐
+│   Store StructureStart in Chunk NBT                             │
+│  ────────────────────────────────────────────────────────────  │
+│  StructureAccessor.setStructureStart(chunk, structure, start)   │
+│                                                                  │
+│  Chunk NBT now contains:                                        │
+│  {                                                               │
+│    "structures": {                                               │
+│      "starts": {                                                 │
+│        "minecraft:village_plains": { ... },                      │
+│        "minecraft:ruined_portal": { ... }                        │
+│      }                                                            │
+│    }                                                              │
+│  }                                                                │
+└─────────┬────────────────────────────────────────────────────────┘
+          │
+          ↓
+  (STRUCTURE_START stage complete)
+  (Chunk proceeds to BIOMES, NOISE, etc.)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+           PHASE 3: STRUCTURE PLACEMENT (AFTER TERRAIN GENERATION)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────┐
+│  Chunk enters FEATURES   │
+│  worldgen stage          │
+└─────────┬────────────────┘
+          │
+          ↓
+┌────────────────────────────────────────────────────────────────┐
+│          ChunkGenerator.generateFeatures()                     │
+│  ─────────────────────────────────────────────────────────────│
+│  1. Place structures (StructureStart.place())                  │
+│  2. Generate ores                                              │
+│  3. Generate vegetation                                        │
+│  4. Generate lakes and springs                                 │
+└─────────┬──────────────────────────────────────────────────────┘
+          │
+          ↓
+┌────────────────────────────────────────────────────────────────┐
+│   Read StructureStart instances from chunk NBT                 │
+│  ─────────────────────────────────────────────────────────────│
+│  For each StructureStart in chunk:                             │
+└─────────┬──────────────────────────────────────────────────────┘
+          │
+          ↓
+┌──────────────────────────────────────────────────────────────────┐
+│              StructureStart.place()                              │
+│   ═══════════════════════════════════════════════════════════   │
+│   *** XEENAA MOD TRACKING MIXIN INTERCEPTS HERE ***             │
+│  ───────────────────────────────────────────────────────────────│
+│                                                                   │
+│  ┌────────────────────────────────────────────────────┐         │
+│  │  OUR MIXIN: trackStructurePlacement()              │         │
+│  │  ────────────────────────────────────────────────  │         │
+│  │  1. Extract structure identifier                   │         │
+│  │  2. Get chunk position and bounding box            │         │
+│  │  3. Record in PlacementTracker:                    │         │
+│  │     - Identifier: minecraft:village_plains         │         │
+│  │     - ChunkPos: (100, 200)                         │         │
+│  │     - BlockBox: [1600, 64, 3200, 1750, 90, 3350]   │         │
+│  │                                                     │         │
+│  │  4. Log placement (DEBUG):                         │         │
+│  │     "Structure placed: minecraft:village_plains    │         │
+│  │      at chunk (100, 200)"                          │         │
+│  │                                                     │         │
+│  │  Performance: ~0.0002ms (negligible) ✓             │         │
+│  └────────────────────────────────────────────────────┘         │
+│                                                                   │
+│  Continue with normal placement:                                 │
+│                                                                   │
+│  ┌────────────────────────────────────────────────────┐         │
+│  │  For each StructurePiece in children:              │         │
+│  │  ────────────────────────────────────────────────  │         │
+│  │  1. Check if piece overlaps current chunk          │         │
+│  │  2. If yes:                                        │         │
+│  │     - StructurePiece.generate()                    │         │
+│  │     - Load NBT template (if applicable)            │         │
+│  │     - Apply StructureProcessors:                   │         │
+│  │       • Block randomization                        │         │
+│  │       • Loot table insertion                       │         │
+│  │       • Degradation effects                        │         │
+│  │     - Place blocks in world                        │         │
+│  │     - Spawn entities (villagers, mobs, chests)     │         │
+│  │                                                     │         │
+│  │  Time: 5-20ms per structure (depends on size)      │         │
+│  └────────────────────────────────────────────────────┘         │
+└─────────┬─────────────────────────────────────────────────────────┘
+          │
+          ↓
+     (Structure placed in world)
+     (Players can now see and interact with it)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                                  SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+PHASE 1 (World Load):
+  569 structures → Dimension filter → 400 structures
+                → Biome filter → 80-150 structure sets
+                → Our mixin modifies spacing → Calculator created
+  Frequency: Once per dimension
+  Cost: ~1-2 seconds (negligible)
+
+PHASE 2 (Per Chunk):
+  80-150 structure sets → Grid check → 5-20 grid matches
+                       → Biome check → 2-10 compatible
+                       → Generation → 1-3 successful
+  Frequency: Every chunk (BOTTLENECK)
+  Cost: 20-80ms per chunk (4-8x slower than vanilla)
+  Our mod impact: 2x spacing → 50% fewer attempts → 10-40ms per chunk
+
+PHASE 3 (Placement):
+  Read StructureStart from NBT → Place structure pieces → Blocks in world
+  Frequency: Per placed structure
+  Cost: 5-20ms per structure
+  Our tracking: ~0.0002ms (negligible)
+
+═══════════════════════════════════════════════════════════════════════════════

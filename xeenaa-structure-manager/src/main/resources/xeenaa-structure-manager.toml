@@ -1,0 +1,20 @@
+# Xeenaa Structure Manager Configuration
+# https://github.com/canya/xeenaa-structure-manager
+
+[performance]
+# Performance preset: Controls structure spacing optimization
+# Available presets:
+#   - "Vanilla": No optimization (1.0x spacing) - baseline performance
+#   - "Balanced": 50% faster worldgen, good structure density (2.0x) [RECOMMENDED]
+#   - "Performance": 80% faster worldgen, sparse structures (3.0x)
+#   - "Ultra": 90% faster worldgen, very sparse structures (4.0x)
+#
+# Performance scaling is quadratic:
+#   2x spacing = 75% fewer placement attempts
+#   3x spacing = 89% fewer attempts
+#   4x spacing = 94% fewer attempts
+preset = "Balanced"
+
+# Advanced: Set custom spacing multiplier (overrides preset if uncommented)
+# Must be >= 1.0 (values < 1.0 will be rejected and default to 2.0)
+# spacing_multiplier = 2.5

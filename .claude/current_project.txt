@@ -1,9 +1,1 @@
-# Current Active Project
-
-CURRENT_PROJECT=xeenaa-structure-manager
-
-# Available Projects:
-# - xeena-village-manager (in progress)
-# - xeenaa-fabric-enhancements (in progress)
-# - xeenaa-soulbound (not started)
-# - xeenaa-structure-manager (just created)
+CURRENT_PROJECT=xeenaa-alexs-mobs

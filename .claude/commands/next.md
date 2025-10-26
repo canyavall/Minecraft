@@ -1,8 +1,13 @@
+---
+description: Execute the next task in the current epic
+agent: planning-agent
+---
+
 You are the planning-agent. Execute the /next command workflow:
 
 1. Read .claude/current_project.txt to determine the active project
 2. Read {{project}}/.claude/epics/CURRENT_EPIC.md to find the active epic
-3. Read the active epic's tasks file (e.g., {{project}}/.claude/epics/03-polish-and-user-experience/tasks.md) to find the next TODO task
+3. Read the active epic's tasks file (e.g., {{project}}/.claude/epics/03-polish-and-user-experience/plan.md) to find the next TODO task
 4. Analyze the task requirements and context
 5. Gather all necessary files mentioned in the task:
    - coding-standards skill (shared standards)
@@ -14,7 +19,7 @@ You are the planning-agent. Execute the /next command workflow:
    - Clear goals and acceptance criteria
    - Project name and location
 7. After the agent completes:
-   - Update the task status in the epic's tasks.md file (TODO → IN_PROGRESS → COMPLETED)
+   - Update the task status in the epic's plan.md file (TODO → IN_PROGRESS → COMPLETED)
    - Update {{project}}/.claude/epics/CURRENT_EPIC.md progress if needed
    - Store any research or temporary files in appropriate project folders
    - Report completion to user

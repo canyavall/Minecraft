@@ -1,0 +1,8 @@
+{
+  "entity.xeenaa-alexs-mobs.test_animal": "Test Animal",
+  "item.xeenaa-alexs-mobs.test_animal_spawn_egg": "Test Animal Spawn Egg",
+  "itemGroup.xeenaa-alexs-mobs.main": "Xeenaa's Alex's Mobs",
+  "subtitles.entity.test_animal.ambient": "Test Animal grunts",
+  "subtitles.entity.test_animal.hurt": "Test Animal hurts",
+  "subtitles.entity.test_animal.death": "Test Animal dies"
+}

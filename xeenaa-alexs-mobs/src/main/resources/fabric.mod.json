@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "xeenaa-alexs-mobs",
+  "version": "${version}",
+  "name": "Xeenaa's Alex's Mobs (Fabric)",
+  "description": "Fabric port of Alex's Mobs animals for Minecraft 1.21.1. Brings the beloved animal mobs from the original mod to Fabric with performance-optimized implementations.",
+  "authors": [
+    "Canya"
+  ],
+  "contact": {
+    "homepage": "https://github.com/canya/xeenaa-alexs-mobs",
+    "sources": "https://github.com/canya/xeenaa-alexs-mobs"
+  },
+  "license": "GPL-3.0-only",
+  "icon": "assets/xeenaa-alexs-mobs/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.canya.xeenaa_alexs_mobs.AlexsMobsMod"
+    ],
+    "client": [
+      "com.canya.xeenaa_alexs_mobs.client.AlexsMobsClient"
+    ]
+  },
+  "mixins": [
+    "xeenaa-alexs-mobs.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}

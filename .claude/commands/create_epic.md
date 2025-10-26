@@ -1,96 +1,69 @@
-You are the epic-agent creating a new epic with business requirements.
+---
+description: Create a new epic with business requirements and game mechanics design
+agent: epic-agent
+---
+
+You are the epic-agent creating a new epic.
+
+## User Request
+
+"$ARGUMENTS"
 
 ## Your Task
 
-A user wants to create a new epic:
-
-"$ARGUMENTS"
+Create a new epic with comprehensive business requirements and game mechanics design (for Minecraft mods).
 
 ## Execution Steps
 
 ### 1. Read Project Context
+
 - Read `.claude/current_project.txt` to determine the active project
-- Read `{{project}}/.claude/project.md` to understand current project state
+- If no project set, inform user they need to set a project first and stop
+- Read `{{project}}/.claude/project.md` to understand current project
 - Read `{{project}}/.claude/epics/CURRENT_EPIC.md` to see existing epics
 
-### 2. Validate Epic Creation
+### 2. Validate Epic Need
+
 - Determine if this truly needs a NEW epic or fits in existing epic
 - If fits in existing epic, inform user and suggest using that epic instead
-- If new epic is justified, proceed to next step
+- If new epic is justified, proceed
 
 ### 3. Create Epic Structure
+
 - Determine next epic number (e.g., if last is 04, create 05)
 - Create epic folder: `{{project}}/.claude/epics/##-epic-name/`
   - Use kebab-case for epic name (e.g., `05-village-defense-system`)
   - Ensure number is zero-padded (01, 02, etc.)
 
-### 4. Design Business Requirements
-Create `{{project}}/.claude/epics/##-epic-name/requirements.md` with:
+### 4. Create Requirements Document
 
+Follow the `epic-requirements` skill to create `{{project}}/.claude/epics/##-epic-name/requirements.md`.
+
+The skill provides the complete template and examples - use it.
+
+### 5. Create Placeholder for Plan
+
+Create empty placeholder: `{{project}}/.claude/epics/##-epic-name/plan.md`
+
+Add comment:
 ```markdown
-# Epic ##: [Epic Name]
+# Epic ##: [Epic Name] - Implementation Plan
 
-**Created**: [Date]
-**Status**: PLANNING
-**Priority**: [Critical/High/Medium/Low]
+**Status**: PENDING
+**Prerequisites**: requirements.md must be validated by user
 
-## Business Value
+---
 
-[What value does this epic deliver to users/players?]
-
-## Overview
-
-[High-level description of what this epic encompasses]
-
-## Features
-
-### Feature 1: [Feature Name]
-**Description**: [What this feature does]
-**User Experience**: [How players interact with it]
-**Success Criteria**:
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-[Repeat for each feature in epic]
-
-## Game Mechanics (if applicable)
-
-### Progression System
-[How players progress/unlock features]
-
-### Economy/Balance
-[Costs, rewards, balancing considerations]
-
-### Combat/Interaction Systems
-[How systems interact with gameplay]
-
-## Technical Considerations
-
-[Any known technical constraints or requirements]
-
-## Dependencies
-
-- [Other epics or systems this depends on]
-
-## Out of Scope
-
-[What this epic explicitly does NOT include]
-
-## Acceptance Criteria (Epic-Level)
-
-- [ ] All features deliver stated business value
-- [ ] User experience is intuitive and polished
-- [ ] Performance impact is acceptable
-- [ ] Compatible with existing systems
-
+This file will be created by planning-agent when user runs `/create_plan`.
 ```
 
-### 5. Update Epic Tracking
+### 6. Update Epic Tracking
+
 - Update `{{project}}/.claude/epics/CURRENT_EPIC.md`:
-  - Add new epic to the overview table with status "PLANNING"
+  - Add new epic to overview table with status "PLANNING"
   - Do NOT set as active epic yet (user needs to validate first)
 
-### 6. Report to User
+### 7. Report to User
 
 Inform user:
 - Epic created: `{{project}}/.claude/epics/##-epic-name/`
@@ -100,10 +73,8 @@ Inform user:
 
 ## Important Rules
 
-- **Business-focused**: requirements.md should be readable by non-technical stakeholders
-- **No technical tasks**: Do NOT create tasks.md - that's done by `/create_plan`
+- **Business-focused**: requirements.md uses business language (follow epic-requirements skill)
+- **No technical tasks**: Do NOT create plan.md content - that's done by `/create_plan`
 - **User validation**: Stop after creating requirements.md and wait for user approval
-- **Game design**: Include game mechanics design (progression, economy, balance) when applicable
 - **Epic numbering**: Always use zero-padded numbers (01, 02, 03, etc.)
-
-If no current project is set, ask user to set project first.
+- **Follow skill**: Use the epic-requirements skill for structure and templates

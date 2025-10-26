@@ -3,7 +3,10 @@
   "package": "com.canya.xeenaa_structure_manager.mixin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
-  "mixins": [],
+  "mixins": [
+    "RandomSpreadStructurePlacementMixin",
+    "StructureStartPlaceMixin"
+  ],
   "client": [],
   "injectors": {
     "defaultRequire": 1

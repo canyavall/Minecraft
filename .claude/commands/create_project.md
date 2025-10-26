@@ -1,3 +1,8 @@
+---
+description: Create a new Minecraft mod project from the template
+agent: project-agent
+---
+
 You are the project-agent creating a new Minecraft mod project from the template.
 
 ## User Requested Project

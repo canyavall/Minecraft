@@ -1,0 +1,59 @@
+# Mod Icon Placeholder
+
+## Required File
+- **Filename**: icon.png
+- **Size**: 128x128 pixels
+- **Format**: PNG (RGBA)
+- **Location**: This directory (assets/xeenaa-alexs-mobs/)
+
+## Purpose
+The icon.png file is displayed:
+- In the mods list menu
+- On mod repository pages (Modrinth, CurseForge)
+- In launcher mod selection screens
+
+## Creating the Icon
+
+### Option 1: Image Editor
+Use any image editor (GIMP, Photoshop, Paint.NET, etc.):
+1. Create new 128x128 image
+2. Design mod logo/icon
+3. Export as PNG with transparency (if desired)
+4. Save as `icon.png` in this directory
+
+### Option 2: Online Tools
+Use online icon generators:
+- favicon.io
+- canva.com
+- pixlr.com
+
+### Option 3: Blockbench
+Export a model view as icon:
+1. Open entity model in Blockbench
+2. Position camera for good angle
+3. Screenshot > Export as PNG
+4. Crop/resize to 128x128
+
+## Design Guidelines
+- **Clear and Recognizable**: Should be readable at small sizes
+- **Representative**: Reflect mod theme (animals, nature, Alex's Caves style)
+- **High Contrast**: Ensure visibility on light and dark backgrounds
+- **Simple**: Avoid overly complex designs at 128x128
+
+## Suggestions for Alex's Mobs Icon
+- Silhouette of iconic mod animal (Capybara, Flying Fish)
+- Paw print with "AM" text
+- Binoculars or safari theme
+- Collection of animal silhouettes
+
+## Temporary Solution
+Until icon.png is created, Fabric Loader will use a default placeholder icon.
+The mod will function normally without a custom icon.
+
+## Integration
+The icon is automatically detected by Fabric Loader from fabric.mod.json:
+```json
+"icon": "assets/xeenaa-alexs-mobs/icon.png"
+```
+
+No code changes required once file is added.

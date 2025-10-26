@@ -1,0 +1,20 @@
+{
+  "entity.test_animal.ambient": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/test_animal/ambient1"
+    ],
+    "subtitle": "subtitles.entity.test_animal.ambient"
+  },
+  "entity.test_animal.hurt": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/test_animal/hurt1"
+    ],
+    "subtitle": "subtitles.entity.test_animal.hurt"
+  },
+  "entity.test_animal.death": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/test_animal/death1"
+    ],
+    "subtitle": "subtitles.entity.test_animal.death"
+  }
+}

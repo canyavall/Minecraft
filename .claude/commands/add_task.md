@@ -1,3 +1,8 @@
+---
+description: Add a new task to the current epic's plan.md
+agent: planning-agent
+---
+
 You are the planning-agent adding a new task to the current epic.
 
 ## User Requested Task
@@ -9,12 +14,12 @@ You are the planning-agent adding a new task to the current epic.
 ### 1. Read Project Context
 - Read `.claude/current_project.txt` to determine the active project
 - Read `{{project}}/.claude/epics/CURRENT_EPIC.md` to find the active epic
-- Read `{{project}}/.claude/epics/##-epic-name/tasks.md` to see existing tasks
+- Read `{{project}}/.claude/epics/##-epic-name/plan.md` to see existing tasks
 - Read `{{project}}/.claude/epics/##-epic-name/requirements.md` for context
 
 ### 2. Determine Next Task Number
 
-Find the highest task number in tasks.md:
+Find the highest task number in plan.md:
 - If last task is TASK-014, create TASK-015
 - If last task is TASK-014.2 (sub-task), still create TASK-015 (main task)
 - Main tasks use sequential numbers (001, 002, 003, etc.)
@@ -35,9 +40,9 @@ Find the highest task number in tasks.md:
    - Options: implementation-agent, research-agent, validation-agent
    - Default: implementation-agent (most common)
 
-### 4. Create Task in tasks.md
+### 4. Create Task in plan.md
 
-Add the new task to `{{project}}/.claude/epics/##-epic-name/tasks.md`:
+Add the new task to `{{project}}/.claude/epics/##-epic-name/plan.md`:
 
 ```markdown
 ---
@@ -85,7 +90,7 @@ Add the new task to `{{project}}/.claude/epics/##-epic-name/tasks.md`:
 
 ### 5. Update Task Overview
 
-Update the task overview section in tasks.md:
+Update the task overview section in plan.md:
 
 ```markdown
 ## Task Overview
@@ -107,7 +112,7 @@ Update `{{project}}/.claude/epics/CURRENT_EPIC.md` to reflect:
 
 Inform the user:
 - New task created: TASK-XXX
-- Task location: `{{project}}/.claude/epics/##-epic-name/tasks.md`
+- Task location: `{{project}}/.claude/epics/##-epic-name/plan.md`
 - Priority: [priority level]
 - Estimated effort: [hours]
 - Next step: Run `/next` to execute this task (or continue with current tasks)
@@ -116,7 +121,7 @@ Inform the user:
 ## Important Rules
 
 - **Main task numbering**: Use sequential numbers (TASK-015, TASK-016, not TASK-015.1)
-- **Epic-specific**: Task goes in the CURRENT active epic's tasks.md
+- **Epic-specific**: Task goes in the CURRENT active epic's plan.md
 - **Context from requirements**: Reference the epic's requirements.md to understand what feature this supports
 - **User input**: Always ask for priority and effort - don't assume
 - **Queue position**: New tasks go at the end of TODO queue unless user specifies otherwise

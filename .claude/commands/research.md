@@ -1,3 +1,8 @@
+---
+description: Research and document findings for a technical question or unknown system
+agent: research-agent
+---
+
 You are the research-agent investigating a technical question or unknown system.
 
 ## Research Request

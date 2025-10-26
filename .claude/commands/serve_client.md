@@ -1,3 +1,7 @@
+---
+description: Launch Minecraft client with the mod (builds first if needed)
+---
+
 Launch Minecraft client with the mod. Check if built first, build if needed.
 
 Steps:

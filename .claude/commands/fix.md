@@ -1,3 +1,8 @@
+---
+description: Create a bug fix sub-task for the current epic
+agent: planning-agent
+---
+
 You are the planning-agent creating a bug fix task for the current epic.
 
 ## User Reported Bug
@@ -9,7 +14,7 @@ You are the planning-agent creating a bug fix task for the current epic.
 ### 1. Read Project Context
 - Read `.claude/current_project.txt` to determine the active project
 - Read `{{project}}/.claude/epics/CURRENT_EPIC.md` to find the active epic
-- Read `{{project}}/.claude/epics/##-epic-name/tasks.md` to see existing tasks
+- Read `{{project}}/.claude/epics/##-epic-name/plan.md` to see existing tasks
 
 ### 2. Identify Related Task
 
@@ -29,7 +34,7 @@ Check if there are already fix sub-tasks for the related task:
 
 ### 4. Create Bug Fix Task
 
-Add the new sub-task to `{{project}}/.claude/epics/##-epic-name/tasks.md`:
+Add the new sub-task to `{{project}}/.claude/epics/##-epic-name/plan.md`:
 
 ```markdown
 ---
@@ -82,7 +87,7 @@ Fix the reported bug and ensure the feature works as intended.
 
 ### 5. Update Epic Task Count
 
-Update the task overview in tasks.md:
+Update the task overview in plan.md:
 ```markdown
 ## Task Overview
 
@@ -100,7 +105,7 @@ Update `{{project}}/.claude/epics/CURRENT_EPIC.md` to reflect the new task count
 
 Inform the user:
 - New task created: TASK-XXX.X
-- Task location: `{{project}}/.claude/epics/##-epic-name/tasks.md`
+- Task location: `{{project}}/.claude/epics/##-epic-name/plan.md`
 - Next step: Run `/next` to execute the bug fix
 - Priority: High (bug fixes are prioritized)
 
@@ -110,7 +115,7 @@ Inform the user:
 - **No immediate fix**: Don't fix the bug now - create the task for `/next` to execute
 - **Ask for context**: If unclear which task the bug relates to, ask the user
 - **High priority**: Bug fixes are always high priority in the task queue
-- **Epic-specific**: Task goes in the CURRENT active epic's tasks.md
+- **Epic-specific**: Task goes in the CURRENT active epic's plan.md
 
 If no current project is set, ask user to set project first.
 If no active epic is set, ask user which epic this bug fix belongs to.
