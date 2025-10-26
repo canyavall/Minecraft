@@ -107,6 +107,11 @@ public class AlexsMobsClient implements ClientModInitializer {
             com.canya.xeenaa_alexs_mobs.client.renderer.TestAnimalRenderer::new
         );
 
+        // Register Fly renderer (Epic 03 - Proof of Concept)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.FLY,
+            com.canya.xeenaa_alexs_mobs.client.renderer.FlyRenderer::new
+        );
 
         // Future entity renderers will be registered here
         // Example pattern for each entity:
@@ -114,7 +119,7 @@ public class AlexsMobsClient implements ClientModInitializer {
         // EntityRendererRegistry.register(ModEntities.ROADRUNNER, RoadrunnerRenderer::new);
         // EntityRendererRegistry.register(ModEntities.CROCODILE, CrocodileRenderer::new);
 
-        LOGGER.debug("Entity renderer registration complete (1 renderer registered)");
+        LOGGER.debug("Entity renderer registration complete (2 renderers registered)");
     }
 
     /**

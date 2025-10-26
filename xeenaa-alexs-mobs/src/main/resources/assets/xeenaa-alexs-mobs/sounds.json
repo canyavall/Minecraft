@@ -16,5 +16,23 @@
       "xeenaa-alexs-mobs:entity/test_animal/death1"
     ],
     "subtitle": "subtitles.entity.test_animal.death"
+  },
+  "entity.fly.ambient": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/fly/fly_ambient"
+    ],
+    "subtitle": "subtitles.entity.fly.ambient"
+  },
+  "entity.fly.hurt": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/fly/fly_hurt"
+    ],
+    "subtitle": "subtitles.entity.fly.hurt"
+  },
+  "entity.fly.death": {
+    "sounds": [
+      "xeenaa-alexs-mobs:entity/fly/fly_death"
+    ],
+    "subtitle": "subtitles.entity.fly.death"
   }
 }

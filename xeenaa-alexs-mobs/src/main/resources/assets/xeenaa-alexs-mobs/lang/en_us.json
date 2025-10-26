@@ -1,8 +1,13 @@
 {
   "entity.xeenaa-alexs-mobs.test_animal": "Test Animal",
   "item.xeenaa-alexs-mobs.test_animal_spawn_egg": "Test Animal Spawn Egg",
+  "entity.xeenaa-alexs-mobs.fly": "Fly",
+  "item.xeenaa-alexs-mobs.fly_spawn_egg": "Fly Spawn Egg",
   "itemGroup.xeenaa-alexs-mobs.main": "Xeenaa's Alex's Mobs",
   "subtitles.entity.test_animal.ambient": "Test Animal grunts",
   "subtitles.entity.test_animal.hurt": "Test Animal hurts",
-  "subtitles.entity.test_animal.death": "Test Animal dies"
+  "subtitles.entity.test_animal.death": "Test Animal dies",
+  "subtitles.entity.fly.ambient": "Fly buzzes",
+  "subtitles.entity.fly.hurt": "Fly squishes",
+  "subtitles.entity.fly.death": "Fly dies"
 }

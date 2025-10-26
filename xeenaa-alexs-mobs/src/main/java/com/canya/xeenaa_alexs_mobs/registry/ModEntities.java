@@ -1,5 +1,6 @@
 package com.canya.xeenaa_alexs_mobs.registry;
 
+import com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity;
 import com.canya.xeenaa_alexs_mobs.entity.animal.TestAnimalEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -73,6 +74,43 @@ public class ModEntities {
             .build()
     );
 
+    /**
+     * Fly entity - tiny flying pest insect.
+     *
+     * <p>This entity represents a common housefly, serving as a small ambient creature
+     * and demonstrating:
+     * <ul>
+     *   <li>Flying AI and movement patterns</li>
+     *   <li>Tiny hitbox implementation (0.3 × 0.2 blocks)</li>
+     *   <li>Realistic fly behavior (wandering, landing, taking off)</li>
+     *   <li>Low-impact ambient entities</li>
+     * </ul>
+     *
+     * <p><b>Dimensions:</b> 0.3 blocks wide × 0.2 blocks tall (tiny - smaller than a baby chicken)
+     *
+     * <p><b>Spawn Group:</b> CREATURE (ambient passive creature)
+     *
+     * <p><b>Registry Name:</b> {@code xeenaa-alexs-mobs:fly}
+     *
+     * <p><b>Summon Command:</b> {@code /summon xeenaa-alexs-mobs:fly}
+     *
+     * <p><b>Characteristics:</b>
+     * <ul>
+     *   <li>Health: 2 HP (dies in one hit from most sources)</li>
+     *   <li>Movement: 0.5 blocks/tick flying speed (fast and erratic)</li>
+     *   <li>Sounds: Buzzing ambient, squish hurt/death sounds</li>
+     *   <li>Drops: 10% chance of 1 string (fly carcass material)</li>
+     * </ul>
+     *
+     * @see FlyEntity
+     */
+    public static final EntityType<FlyEntity> FLY = register(
+        "fly",
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, FlyEntity::new)
+            .dimensions(EntityDimensions.fixed(0.3f, 0.2f))
+            .build()
+    );
+
     // Future entities will be added here following the pattern above
     // Examples: ALLIGATOR, ANACONDA, ANTEATER, BALD_EAGLE, etc.
 
@@ -119,6 +157,7 @@ public class ModEntities {
     public static void initialize() {
         // Register entity attributes here
         FabricDefaultAttributeRegistry.register(TEST_ANIMAL, TestAnimalEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(FLY, FlyEntity.createAttributes());
 
         // Future attribute registrations will be added here as entities are implemented
         // This ensures entities have proper attributes (health, speed, armor, etc.)

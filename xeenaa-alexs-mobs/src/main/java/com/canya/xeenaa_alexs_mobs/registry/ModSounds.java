@@ -99,6 +99,61 @@ public class ModSounds {
     public static final SoundEvent TEST_ANIMAL_DEATH = register("entity.test_animal.death");
 
     // ============================================
+    // Fly Sounds
+    // ============================================
+
+    /**
+     * Ambient sound for the fly entity.
+     *
+     * <p>This sound plays periodically when the fly is buzzing around in flight or landed.
+     * Should be a subtle buzzing sound that reflects the fly's wings in motion.
+     *
+     * <p><b>Sound Files:</b> {@code sounds/entity/fly/ambient.ogg}
+     * <ul>
+     *   <li>Duration: 2-3 seconds (loopable)</li>
+     *   <li>Volume: 0.3-0.5 (quiet to avoid overwhelming players)</li>
+     *   <li>Pitch variation: 0.9-1.1 (configured in sounds.json)</li>
+     * </ul>
+     *
+     * @see com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity#getAmbientSound()
+     */
+    public static final SoundEvent FLY_AMBIENT = register("entity.fly.ambient");
+
+    /**
+     * Hurt sound for the fly entity.
+     *
+     * <p>This sound plays when the fly takes damage from any source. Given that flies
+     * die in one hit (2 HP), this effectively serves as a "death alert" sound.
+     *
+     * <p><b>Sound Files:</b> {@code sounds/entity/fly/hurt.ogg}
+     * <ul>
+     *   <li>Duration: 0.2-0.5 seconds (sharp, quick buzz)</li>
+     *   <li>Pitch: Higher than ambient to convey distress</li>
+     *   <li>Volume: 0.5-0.7 (slightly louder, rare event)</li>
+     * </ul>
+     *
+     * @see com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity#getHurtSound(net.minecraft.entity.damage.DamageSource)
+     */
+    public static final SoundEvent FLY_HURT = register("entity.fly.hurt");
+
+    /**
+     * Death sound for the fly entity.
+     *
+     * <p>This sound plays when the fly's health reaches zero and it dies. Should be
+     * a buzzing sound that fades out as the fly falls to the ground with still wings.
+     *
+     * <p><b>Sound Files:</b> {@code sounds/entity/fly/death.ogg}
+     * <ul>
+     *   <li>Duration: 1-2 seconds (fade-out)</li>
+     *   <li>Pitch: Drops slightly as it fades (simulates wings slowing)</li>
+     *   <li>Volume: Starts at 0.5 and fades to silence</li>
+     * </ul>
+     *
+     * @see com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity#getDeathSound()
+     */
+    public static final SoundEvent FLY_DEATH = register("entity.fly.death");
+
+    // ============================================
     // Registration System
     // ============================================
 
@@ -183,7 +238,7 @@ public class ModSounds {
      * @return the number of sound events registered by this class
      */
     private static int getRegisteredSoundCount() {
-        // Currently: TEST_ANIMAL_AMBIENT, TEST_ANIMAL_HURT, TEST_ANIMAL_DEATH = 3
-        return 3;
+        // Currently: TEST_ANIMAL (3) + FLY (3) = 6
+        return 6;
     }
 }

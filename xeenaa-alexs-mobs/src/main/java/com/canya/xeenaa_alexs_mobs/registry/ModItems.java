@@ -93,6 +93,37 @@ public class ModItems {
             new Item.Settings())
     );
 
+    /**
+     * Spawn egg for the Fly entity.
+     *
+     * <p>This spawn egg can be used to spawn Fly entities in the world. The egg
+     * represents a cluster of fly eggs with dark coloring and red compound eyes.
+     *
+     * <p><b>Colors:</b>
+     * <ul>
+     *   <li>Primary (base): {@code 0x404040} (dark grey - fly body/eggs)</li>
+     *   <li>Secondary (spots): {@code 0x8B0000} (dark red - compound eyes)</li>
+     * </ul>
+     *
+     * <p><b>Registry Name:</b> {@code xeenaa-alexs-mobs:fly_spawn_egg}
+     *
+     * <p><b>Display Name:</b> "Fly Spawn Egg" (from en_us.json)
+     *
+     * <p><b>Usage:</b> Available in the creative inventory under the
+     * "Xeenaa's Alex's Mobs" tab. Right-click to spawn a Fly entity.
+     *
+     * <p><b>Spawned Entity:</b> Creates a {@link com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity}
+     * with 2 HP that immediately begins flying around or landing on nearby blocks.
+     *
+     * @see ModEntities#FLY
+     * @see com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity
+     */
+    public static final Item FLY_SPAWN_EGG = register(
+        "fly_spawn_egg",
+        new SpawnEggItem(ModEntities.FLY, 0x404040, 0x8B0000,
+            new Item.Settings())
+    );
+
     // Future spawn eggs will be added here following the pattern above
     // Examples: ALLIGATOR_SPAWN_EGG, ANACONDA_SPAWN_EGG, ANTEATER_SPAWN_EGG, etc.
 
@@ -157,6 +188,7 @@ public class ModItems {
                 .entries((context, entries) -> {
                     // Add all spawn eggs to the creative tab
                     entries.add(TEST_ANIMAL_SPAWN_EGG);
+                    entries.add(FLY_SPAWN_EGG);
 
                     // Future items will be added here as they are implemented
                     // This ensures all mod items appear in the custom creative tab
