@@ -113,13 +113,49 @@ public class AlexsMobsClient implements ClientModInitializer {
             com.canya.xeenaa_alexs_mobs.client.renderer.FlyRenderer::new
         );
 
+        // Register Cockroach renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.COCKROACH,
+            com.canya.xeenaa_alexs_mobs.client.renderer.CockroachRenderer::new
+        );
+
+        // Register Triops renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.TRIOPS,
+            com.canya.xeenaa_alexs_mobs.client.renderer.TriopsRenderer::new
+        );
+
+        // Register Hummingbird renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.HUMMINGBIRD,
+            com.canya.xeenaa_alexs_mobs.client.renderer.HummingbirdRenderer::new
+        );
+
+        // Register Mudskipper renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.MUDSKIPPER,
+            com.canya.xeenaa_alexs_mobs.client.renderer.MudskipperRenderer::new
+        );
+
+        // Register Blobfish renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.BLOBFISH,
+            com.canya.xeenaa_alexs_mobs.client.renderer.BlobfishRenderer::new
+        );
+
+        // Register Crow renderer (Epic 03)
+        registerEntityRenderer(
+            com.canya.xeenaa_alexs_mobs.registry.ModEntities.CROW,
+            com.canya.xeenaa_alexs_mobs.client.renderer.CrowRenderer::new
+        );
+
         // Future entity renderers will be registered here
         // Example pattern for each entity:
         // EntityRendererRegistry.register(ModEntities.GRIZZLY_BEAR, GrizzlyBearRenderer::new);
         // EntityRendererRegistry.register(ModEntities.ROADRUNNER, RoadrunnerRenderer::new);
         // EntityRendererRegistry.register(ModEntities.CROCODILE, CrocodileRenderer::new);
 
-        LOGGER.debug("Entity renderer registration complete (2 renderers registered)");
+        LOGGER.debug("Entity renderer registration complete (8 renderers registered)");
     }
 
     /**

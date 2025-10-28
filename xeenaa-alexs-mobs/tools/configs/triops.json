@@ -1,0 +1,27 @@
+{
+  "name": "Triops",
+  "category": "animal",
+  "type": "swimming",
+  "attributes": {
+    "health": 3.0,
+    "speed": 0.4,
+    "follow_range": 8.0
+  },
+  "dimensions": {
+    "width": 0.35,
+    "height": 0.25
+  },
+  "spawn_egg": {
+    "primary_color": "0xC4A57B",
+    "secondary_color": "0x8B7355"
+  },
+  "renderer": {
+    "shadow_radius": 0.2
+  },
+  "ai_goals": [],
+  "animations": {
+    "idle": "auto",
+    "swim": "auto",
+    "death": "default"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Fly",
+  "category": "animal",
+  "type": "flying",
+  "attributes": {
+    "health": 2.0,
+    "speed": 0.6,
+    "flying_speed": 0.8,
+    "follow_range": 8.0
+  },
+  "dimensions": {
+    "width": 0.3,
+    "height": 0.3
+  },
+  "spawn_egg": {
+    "primary_color": "0x3B3B3B",
+    "secondary_color": "0x8B0000"
+  },
+  "renderer": {
+    "shadow_radius": 0.2
+  },
+  "ai_goals": [],
+  "animations": {
+    "idle": "auto",
+    "fly": "auto",
+    "death": "default"
+  }
+}

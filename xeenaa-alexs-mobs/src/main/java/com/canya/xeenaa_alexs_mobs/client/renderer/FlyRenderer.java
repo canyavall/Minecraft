@@ -4,8 +4,11 @@ import com.canya.xeenaa_alexs_mobs.client.model.FlyModel;
 import com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.joml.Quaternionf;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 /**
@@ -148,6 +151,25 @@ public class FlyRenderer extends GeoEntityRenderer<FlyEntity> {
      */
     public FlyRenderer(EntityRendererFactory.Context context) {
         super(context, new FlyModel());
+        this.shadowRadius = 0.1f;
+    }
+
+    @Override
+    public void render(FlyEntity entity, float entityYaw, float partialTick, MatrixStack poseStack,
+                       VertexConsumerProvider bufferSource, int packedLight) {
+        poseStack.push();
+
+        // Move up so tiny fly doesn't spawn underground (needs larger offset due to model pivot)
+        poseStack.translate(0, 0.5, 0);
+
+        // Scale down to 25% size (fly was way too big)
+        poseStack.scale(0.25f, 0.25f, 0.25f);
+
+        // Flip upside down (rotate 180 degrees around Z axis)
+        poseStack.multiply(new Quaternionf().rotateZ((float) Math.PI));
+
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+        poseStack.pop();
     }
 
     /**
@@ -203,6 +225,6 @@ public class FlyRenderer extends GeoEntityRenderer<FlyEntity> {
      */
     @Override
     public Identifier getTextureLocation(FlyEntity entity) {
-        return Identifier.of("xeenaa-alexs-mobs", "textures/entity/fly.png");
+        return Identifier.of("xeenaa-alexs-mobs", "textures/entity/fly/fly.png");
     }
 }

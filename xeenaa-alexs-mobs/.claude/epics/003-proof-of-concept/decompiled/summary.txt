@@ -1,0 +1,3 @@
+Summary for C:/Users/canya/.gradle/caches/fabric-loom/minecraftMaven/com/github/alexthe666/alexsmobs/1.22.9/alexsmobs-1.22.9.jar
+Decompiled with CFR 0.152
+Exception analysing jar org.benf.cfr.reader.util.ConfusedCFRException: No such jar file C:/Users/canya/.gradle/caches/fabric-loom/minecraftMaven/com/github/alexthe666/alexsmobs/1.22.9/alexsmobs-1.22.9.jar

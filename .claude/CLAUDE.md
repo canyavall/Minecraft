@@ -2,6 +2,175 @@
 
 This workspace contains multiple Minecraft 1.21.1 Fabric mods sharing common infrastructure (agents, commands, skills) while maintaining independent codebases.
 
+---
+
+## CRITICAL: Intent Recognition
+
+**ALWAYS determine user intent BEFORE taking action:**
+
+### Informational Requests (Answer ONLY - No Actions)
+
+User wants **information/explanation** when they say:
+- "How does X work?"
+- "What is Y?"
+- "Explain Z"
+- "Tell me about..."
+- "Can you describe..."
+- "Why does..."
+- "Show me..."
+- "What's the difference between..."
+
+**Response**: Provide clear, concise explanation. **DO NOT** use tools, create files, or modify code unless explicitly requested.
+
+### Action Requests (Use Tools - Take Actions)
+
+User wants **implementation/changes** when they say:
+- "Implement X"
+- "Write Y"
+- "Create Z"
+- "Fix the bug"
+- "Add feature"
+- "Update the code"
+- "Modify..."
+- "Build..."
+- "Set up..."
+
+**Response**: Use appropriate tools, create/modify files, take requested actions.
+
+### Ambiguous Requests (ASK for Clarification)
+
+If unclear whether user wants information or action:
+- **ASK**: "Would you like me to [action] or just explain how to do it?"
+- **DO NOT** assume - always clarify first
+
+**Example**:
+- User: "I need a guard system"
+- Assistant: "Would you like me to implement a guard system, or would you like me to explain how to approach building one?"
+
+---
+
+## CRITICAL: Automatic Command/Agent Invocation
+
+**You can automatically invoke commands without explicit slash commands** when user intent is clear.
+
+### Workflow Command Triggers
+
+Detect these patterns and **automatically use the SlashCommand tool**:
+
+| User Says | Intent | Auto-Invoke |
+|-----------|--------|-------------|
+| "execute the next task" | Start next task | `/next` |
+| "work on the next task" | Start next task | `/next` |
+| "continue with tasks" | Start next task | `/next` |
+| "let's move to the next one" | Start next task | `/next` |
+| "create/add a new epic [name]" | New epic | `/create_epic [name]` |
+| "start new epic called [name]" | New epic | `/create_epic [name]` |
+| "create implementation plan" | Generate tasks | `/create_plan` |
+| "generate tasks for this epic" | Generate tasks | `/create_plan` |
+| "add task: [description]" | Add task | `/add_task [description]` |
+| "new task: [description]" | Add task | `/add_task [description]` |
+| "there's a bug: [description]" | Bug fix | `/fix [description]` |
+| "fix this issue: [description]" | Bug fix | `/fix [description]` |
+| "research [topic]" | Research | `/research [topic]` |
+| "investigate [topic]" | Research | `/research [topic]` |
+| "build and launch" | Test in game | `/serve_client` |
+| "run the client" | Test in game | `/serve_client` |
+| "create new project [name]" | New project | `/create_project [name]` |
+
+### Agent-Specific Triggers
+
+Detect these patterns and **automatically use the SlashCommand tool** to invoke specialized agents:
+
+| User Says | Intent | Auto-Invoke |
+|-----------|--------|-------------|
+| "we need to change/fix the agent..." | AI infrastructure | `/ai [description]` |
+| "the command isn't working..." | AI infrastructure | `/ai [description]` |
+| "skill needs updating..." | AI infrastructure | `/ai [description]` |
+| "workflow is broken..." | AI infrastructure | `/ai [description]` |
+| "agent boundaries issue..." | AI infrastructure | `/ai [description]` |
+
+### How to Auto-Invoke
+
+**When pattern matches:**
+1. Recognize the intent
+2. Extract parameters (if any)
+3. Use SlashCommand tool with appropriate command
+4. Let the command's agent handle execution
+
+**Example Flow:**
+```
+User: "let's work on the next task"
+
+You (internal):
+- Pattern match: "work on the next task" → /next
+- Action: Use SlashCommand tool
+
+SlashCommand("/next")
+→ planning-agent activates
+→ Reads next TODO task
+→ Invokes appropriate agent
+→ Reports result
+```
+
+### Important Rules
+
+**ALWAYS auto-invoke when:**
+- ✅ Intent is **unambiguous** (clear action requested)
+- ✅ Pattern **strongly matches** command purpose
+- ✅ User language indicates they want action NOW
+
+**NEVER auto-invoke when:**
+- ❌ User is asking "how to" or "what is" (information only)
+- ❌ Pattern is weak or ambiguous
+- ❌ User says "should I" or "could you" (asking permission)
+
+**Examples:**
+
+✅ **Auto-invoke**:
+- "execute the next task" → `/next`
+- "there's a bug in the guard spawning" → `/fix "bug in guard spawning"`
+- "research how Fabric networking works" → `/research "Fabric networking"`
+- "the ai-agent needs fixing" → `/ai "agent needs fixing"`
+
+❌ **Don't auto-invoke**:
+- "how do I run the next task?" → Explain how to use `/next`
+- "should we fix this bug?" → Ask if they want you to create fix task
+- "what does /research do?" → Explain the research command
+
+### Context-Aware Invocation
+
+Consider workflow context:
+
+**If user says:** "add this to the plan"
+- **Context**: Currently reviewing epic requirements
+- **Action**: Auto-invoke `/add_task` with inferred description
+
+**If user says:** "this needs research"
+- **Context**: Currently discussing unknown system
+- **Action**: Auto-invoke `/research` with topic from conversation
+
+### Confirmation for Destructive Actions
+
+For potentially disruptive commands, **ask first**:
+- Creating new epics (changes project structure)
+- Creating new projects (major operation)
+
+**Example:**
+```
+User: "create new epic for economy system"
+
+You: "I'll create a new epic called 'Economy System'. This will:
+- Create {{project}}/.claude/epics/[##]-economy-system/
+- Add requirements.md file
+- Update CURRENT_EPIC.md
+
+Proceed? (yes/no)"
+
+[If yes] → Use SlashCommand("/create_epic Economy System")
+```
+
+---
+
 ## Active Projects
 
 - **xeena-village-manager** - Villager management mod with GUI and guard system
@@ -18,13 +187,20 @@ workspace/
 ├── .claude/                       # SHARED infrastructure
 │   ├── agents/                    # Agent definitions
 │   ├── commands/                  # Global commands
-│   ├── skills/                    # Shared knowledge
+│   ├── skills/                    # Shared workflow patterns
+│   ├── knowledge/                 # Centralized research (NEW!)
+│   │   ├── knowledge-index.json   # Tag-based index
+│   │   ├── minecraft/             # Core Minecraft systems
+│   │   ├── fabric-api/            # Fabric API documentation
+│   │   ├── libraries/             # Third-party libraries
+│   │   ├── graphics/              # Visual systems
+│   │   └── performance/           # Optimization knowledge
 │   └── current_project.txt        # Active project tracker
 │
 ├── <project>/                     # PROJECT-SPECIFIC
 │   ├── .claude/
 │   │   ├── project.md
-│   │   ├── research/
+│   │   ├── research/              # Project-specific research only
 │   │   ├── epics/
 │   │   │   ├── ##-name/
 │   │   │   │   ├── requirements.md    # Business requirements
@@ -52,16 +228,48 @@ All commands automatically target the active project.
 | **project-agent** | Create projects from template, maintain project.md |
 | **epic-agent** | Create business requirements (requirements.md) |
 | **planning-agent** | Create technical tasks (plan.md), orchestrate workflows |
-| **implementation-agent** | **ONLY agent that writes code** |
+| **implementation-agent** | **ONLY agent that writes code, tests, and debugs** |
 | **research-agent** | Research unknowns, document findings |
-| **validation-agent** | Create tests AFTER user manual validation |
 | **ai-agent** | Maintain AI infrastructure (agents/skills/commands) |
 
 **Agent files**: `.claude/agents/<agent-name>.md`
 
-## Skills (Shared Knowledge)
+## Knowledge Base (Centralized Research)
 
-Skills provide specialized knowledge that activates automatically based on context.
+**NEW**: Cross-project research stored in `.claude/knowledge/` to eliminate duplication.
+
+### Two-Tier Knowledge System
+
+**1. Centralized Knowledge Base** (`.claude/knowledge/`)
+- Universal research shared across ALL projects
+- Tag-based discovery via `knowledge-index.json`
+- Categories: minecraft/, fabric-api/, libraries/, graphics/, performance/
+- Examples: Fabric networking, GeckoLib setup, entity rendering, profiling
+
+**2. Project-Specific Research** (`<project>/.claude/research/`)
+- Project-unique context and decisions
+- Implementation notes specific to THIS mod
+- References centralized knowledge when applicable
+
+### Using the Knowledge Base
+
+**Agents (especially research-agent):**
+1. ALWAYS search `knowledge-index.json` FIRST by tags
+2. Read existing knowledge to avoid duplicate research
+3. Add universal findings to knowledge base
+4. Update index with tags for discoverability
+5. **Follow WRITING_STANDARDS.md** when creating/updating knowledge
+
+**Documentation**:
+- `.claude/knowledge/WRITING_STANDARDS.md` - How to write knowledge files
+- `.claude/knowledge/MIGRATION_GUIDE.md` - How to migrate research
+- `.claude/knowledge/README.md` - Knowledge base overview
+
+## Skills (Shared Workflow Patterns)
+
+Skills provide specialized workflow patterns that activate automatically based on context.
+
+**NOTE**: Skills are for HOW to do things. Knowledge base is for WHAT things are.
 
 ### Minecraft Skills
 - **minecraft-modding** - Core Minecraft systems (loader-agnostic)
@@ -80,7 +288,9 @@ Skills provide specialized knowledge that activates automatically based on conte
 - **performance-testing** - Performance measurement and validation
 
 ### Process Skills
+- **concise-responses** - Provide short answers first, elaborate only when requested
 - **research-methodology** - Research process and documentation
+- **knowledge-base-management** - Knowledge base writing standards and migration
 - **epic-requirements** - requirements.md creation
 - **task-planning** - plan.md creation
 - **multi-project-workflow** - Multi-project patterns and troubleshooting
@@ -97,21 +307,24 @@ Skills provide specialized knowledge that activates automatically based on conte
 
 ## Commands (User-Triggered Workflows)
 
-| Command | Purpose |
-|---------|---------|
-| `/create_project <name>` | Create new mod from template |
-| `/create_epic <name>` | Create business requirements |
-| `/create_plan` | Generate technical tasks from requirements |
-| `/add_task <desc>` | Add task to current epic |
-| `/fix <desc>` | Create bug fix sub-task |
-| `/research <question>` | Research and document findings |
-| `/next` | Execute next task |
-| `/serve_client` | Build and launch Minecraft |
-| `/ai <desc>` | Debug/fix AI infrastructure |
+| Command | Purpose | Natural Language Examples |
+|---------|---------|---------------------------|
+| `/create_project <name>` | Create new mod from template | "create new project MyMod" |
+| `/create_epic <name>` | Create business requirements | "start new epic Guard System" |
+| `/create_plan` | Generate technical tasks from requirements | "create implementation plan" |
+| `/add_task <desc>` | Add task to current epic | "add task: implement GUI" |
+| `/fix <desc>` | Create bug fix sub-task | "there's a bug in spawning" |
+| `/research <question>` | Research and document findings | "research Fabric networking" |
+| `/next` | Execute next task | "work on the next task" |
+| `/serve_client` | Build and launch Minecraft | "build and launch" |
+| `/ai <desc>` | Debug/fix AI infrastructure | "the agent needs fixing" |
 
 **Command files**: `.claude/commands/<command-name>.md`
 
-**Note**: Project switching done via natural language ("Set project to <name>"), not slash commands.
+**Invocation Methods**:
+1. **Explicit**: Use slash command syntax `/next`
+2. **Automatic**: Use natural language "work on the next task" (see Automatic Command Invocation section above)
+3. **Natural Language**: Project switching "Set project to <name>"
 
 ## Workflow Patterns
 
@@ -185,13 +398,14 @@ All projects follow **coding-standards** skill (activates automatically):
 
 ## Key Principles
 
-1. **Shared Infrastructure** - Agents, commands, skills used everywhere
+1. **Shared Infrastructure** - Agents, commands, skills, knowledge used everywhere
 2. **Project Isolation** - Each mod independent
 3. **Context Awareness** - Commands respect active project
-4. **Single Source of Truth** - plan.md only tracking
-5. **Skills-Based Knowledge** - Auto-activated when relevant
-6. **Agent Specialization** - Clear non-overlapping responsibilities
-7. **User Validation** - Manual testing before automated tests
+4. **Single Source of Truth** - plan.md for tasks, knowledge base for research
+5. **Skills-Based Patterns** - Workflows auto-activated when relevant
+6. **Centralized Knowledge** - Universal research in knowledge base, not duplicated
+7. **Agent Specialization** - Clear non-overlapping responsibilities
+8. **User Validation** - Manual testing before automated tests
 
 ---
 

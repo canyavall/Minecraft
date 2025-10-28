@@ -1,19 +1,19 @@
 ---
 name: task-planning
-description: Rules and templates for creating technical tasks.md files from requirements. Use when creating implementation plans via /create_plan command or breaking down features into tasks.
+description: Rules and templates for creating technical plan.md files from requirements. Use when creating implementation plans via /create_plan command or breaking down features into tasks.
 allowed-tools: [Read, Write, Edit]
 ---
 
 # Task Planning Skill
 
-Guidelines and templates for creating technical tasks.md files for epic implementation.
+Guidelines and templates for creating technical plan.md files for epic implementation.
 
-## Purpose of tasks.md
+## Purpose of plan.md
 
-Tasks.md defines **HOW** to implement features technically, NOT **WHAT** business value they deliver.
+Plan.md defines **HOW** to implement features technically, NOT **WHAT** business value they deliver.
 
 ### Audience
-- **Primary**: Developers (implementation-agent, research-agent, validation-agent)
+- **Primary**: Developers (implementation-agent, research-agent)
 - **Secondary**: planning-agent for task orchestration
 
 ### Focus
@@ -29,7 +29,7 @@ Tasks.md defines **HOW** to implement features technically, NOT **WHAT** busines
 
 ### Location
 ```
-{{project}}/.claude/epics/##-epic-name/tasks.md
+{{project}}/.claude/epics/##-epic-name/plan.md
 ```
 
 ### Created By
@@ -237,17 +237,19 @@ custom data components for guard type, level, and equipment.
 approach for guard combat behaviors in 1.21.1.
 ```
 
-### validation-agent
-**Assign For**:
-- Automated test creation (ONLY after user manual validation)
-- Test strategy development
-- Quality assurance procedures
+### Testing Tasks (implementation-agent)
+**Testing is now handled by implementation-agent**:
+- Write automated tests after user manual validation
+- Create test strategy and test cases
+- Implement quality assurance procedures
 
 **Example Task**:
 ```markdown
-**Assigned Agent**: validation-agent
-**Description**: Create automated tests for guard hiring system after
-user has manually validated it works correctly.
+**Assigned Agent**: implementation-agent
+**Description**: Write automated tests for guard hiring system after
+user has manually validated it works correctly. Include unit tests
+for entity creation, integration tests for hiring mechanics, and
+edge case coverage for invalid inputs.
 ```
 
 ## Writing Technical Tasks
@@ -333,7 +335,7 @@ Create the guard system.
 
 ## Quality Checklist
 
-Before finalizing tasks.md:
+Before finalizing plan.md:
 
 - [ ] **All features** from requirements.md have corresponding tasks
 - [ ] **Task numbers** are sequential and correct
@@ -422,11 +424,11 @@ If no: send failure message to player.
 
 ## Integration with Workflow
 
-### planning-agent Creates tasks.md
+### planning-agent Creates plan.md
 1. User validates requirements.md
 2. User runs `/create_plan`
 3. planning-agent reads requirements.md
-4. planning-agent creates tasks.md following this skill
+4. planning-agent creates plan.md following this skill
 5. planning-agent asks user to activate epic
 
 ### During Execution
@@ -444,7 +446,7 @@ If no: send failure message to player.
 
 ## Task vs Requirements
 
-| Aspect | requirements.md | tasks.md |
+| Aspect | requirements.md | plan.md |
 |--------|-----------------|----------|
 | **Focus** | What & Why | How |
 | **Audience** | Stakeholders | Developers |

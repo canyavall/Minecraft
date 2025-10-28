@@ -124,6 +124,51 @@ public class ModItems {
             new Item.Settings())
     );
 
+    /**
+     * Spawn egg for the Cockroach entity (Epic 03).
+     */
+    public static final Item COCKROACH_SPAWN_EGG = register(
+        "cockroach_spawn_egg",
+        new SpawnEggItem(ModEntities.COCKROACH, 0x2E1F0F, 0x4A3218,
+            new Item.Settings())
+    );
+
+    /**
+     * Spawn egg for the Triops entity (Epic 03).
+     */
+    public static final Item TRIOPS_SPAWN_EGG = register(
+        "triops_spawn_egg",
+        new SpawnEggItem(ModEntities.TRIOPS, 0xC4A57B, 0x8B7355,
+            new Item.Settings())
+    );
+
+    /**
+     * Spawn egg for the Hummingbird entity (Epic 03).
+     */
+    public static final Item HUMMINGBIRD_SPAWN_EGG = register(
+        "hummingbird_spawn_egg",
+        new SpawnEggItem(ModEntities.HUMMINGBIRD, 0x00CED1, 0xFF1493,
+            new Item.Settings())
+    );
+
+    /**
+     * Spawn egg for the Mudskipper entity (Epic 03).
+     */
+    public static final Item MUDSKIPPER_SPAWN_EGG = register(
+        "mudskipper_spawn_egg",
+        new SpawnEggItem(ModEntities.MUDSKIPPER, 0x8B7355, 0xD2691E,
+            new Item.Settings())
+    );
+
+    /**
+     * Spawn egg for the Blobfish entity (Epic 03).
+     */
+    public static final Item BLOBFISH_SPAWN_EGG = register(
+        "blobfish_spawn_egg",
+        new SpawnEggItem(ModEntities.BLOBFISH, 0xFFB6C1, 0xFF69B4,
+            new Item.Settings())
+    );
+
     // Future spawn eggs will be added here following the pattern above
     // Examples: ALLIGATOR_SPAWN_EGG, ANACONDA_SPAWN_EGG, ANTEATER_SPAWN_EGG, etc.
 
@@ -189,6 +234,11 @@ public class ModItems {
                     // Add all spawn eggs to the creative tab
                     entries.add(TEST_ANIMAL_SPAWN_EGG);
                     entries.add(FLY_SPAWN_EGG);
+                    entries.add(COCKROACH_SPAWN_EGG);
+                    entries.add(TRIOPS_SPAWN_EGG);
+                    entries.add(HUMMINGBIRD_SPAWN_EGG);
+                    entries.add(MUDSKIPPER_SPAWN_EGG);
+                    entries.add(BLOBFISH_SPAWN_EGG);
 
                     // Future items will be added here as they are implemented
                     // This ensures all mod items appear in the custom creative tab

@@ -37,7 +37,7 @@ Find the highest task number in plan.md:
    - Default: 3-4
 
 3. **Assigned Agent**: "Which agent should handle this?"
-   - Options: implementation-agent, research-agent, validation-agent
+   - Options: implementation-agent, research-agent
    - Default: implementation-agent (most common)
 
 ### 4. Create Task in plan.md

@@ -189,8 +189,8 @@ public class FlyEntity extends FlyingAnimalEntity implements GeoEntity {
     public static DefaultAttributeContainer.Builder createAttributes() {
         return FlyingAnimalEntity.createMobAttributes()
             .add(EntityAttributes.GENERIC_MAX_HEALTH, 2.0D)        // 1 heart (dies in one hit)
-            .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)    // Ground speed (rarely used)
-            .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.3D)      // Aerial speed (primary movement)
+            .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.6D)    // Ground speed (increased from 0.3)
+            .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.8D)      // Aerial speed (increased from 0.3 for faster flight)
             .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 8.0D);     // Detection range
     }
 

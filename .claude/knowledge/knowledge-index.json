@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "description": "Centralized knowledge base index for cross-project Minecraft modding research",
+  "entries": [
+    {
+      "path": "minecraft/villagers.md",
+      "title": "Minecraft Villager System",
+      "tags": ["minecraft", "villagers", "professions", "textures", "ai", "pathfinding", "brain-system", "beds", "poi"],
+      "date_updated": "2025-10-27",
+      "summary": "Complete documentation of villager profession textures, brain AI system, bed claiming mechanics, and Point of Interest system for Minecraft 1.21.1",
+      "related": ["fabric-api/registry.md", "minecraft/entities.md"]
+    },
+    {
+      "path": "performance/profiling.md",
+      "title": "Performance Profiling and Analysis Tools",
+      "tags": ["performance", "profiling", "spark", "jvm", "benchmarking", "tools", "optimization", "monitoring"],
+      "date_updated": "2025-10-27",
+      "summary": "Comprehensive comparison of performance analysis tools for Minecraft development including Spark, JProfiler, JMH, and Fabric-specific optimization mods",
+      "related": ["performance/threading.md", "performance/benchmarking.md"]
+    },
+    {
+      "path": "libraries/porting-forge-to-fabric.md",
+      "title": "Porting Mods from Forge/NeoForge to Fabric",
+      "tags": ["fabric", "forge", "neoforge", "porting", "geckolib", "entities", "animation", "registry", "migration"],
+      "date_updated": "2025-10-27",
+      "summary": "Complete guide for porting mods from Forge/NeoForge to Fabric, covering entity systems, registration patterns, animation library migration (Citadel to GeckoLib), and common pitfalls",
+      "related": ["fabric-api/registry.md", "fabric-api/networking.md", "minecraft/entities.md", "graphics/animations.md"]
+    },
+    {
+      "path": "minecraft/alexs-mobs-reference.md",
+      "title": "Alex's Mobs - Complete Mob Reference Catalog",
+      "tags": ["minecraft", "entities", "mobs", "alex's-mobs", "porting", "reference", "assets", "creatures"],
+      "date_updated": "2025-10-27",
+      "summary": "Complete reference catalog of 92 creatures from Alex's Mobs v1.22.9 with textures, sounds, animations, asset requirements, complexity tiers, and porting effort estimates for entity-heavy mod projects",
+      "related": ["libraries/porting-forge-to-fabric.md", "performance/profiling.md"]
+    }
+  ]
+}

@@ -1,7 +1,13 @@
 package com.canya.xeenaa_alexs_mobs.registry;
 
+import com.canya.xeenaa_alexs_mobs.entity.animal.BlobfishEntity;
+import com.canya.xeenaa_alexs_mobs.entity.animal.CockroachEntity;
+import com.canya.xeenaa_alexs_mobs.entity.animal.CrowEntity;
 import com.canya.xeenaa_alexs_mobs.entity.animal.FlyEntity;
+import com.canya.xeenaa_alexs_mobs.entity.animal.HummingbirdEntity;
+import com.canya.xeenaa_alexs_mobs.entity.animal.MudskipperEntity;
 import com.canya.xeenaa_alexs_mobs.entity.animal.TestAnimalEntity;
+import com.canya.xeenaa_alexs_mobs.entity.animal.TriopsEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
@@ -111,6 +117,89 @@ public class ModEntities {
             .build()
     );
 
+    /**
+     * Cockroach entity - small ground-dwelling insect (Epic 03).
+     */
+    public static final EntityType<CockroachEntity> COCKROACH = register(
+        "cockroach",
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, CockroachEntity::new)
+            .dimensions(EntityDimensions.fixed(0.4f, 0.3f))
+            .build()
+    );
+
+    /**
+     * Triops entity - small aquatic creature (Epic 03).
+     */
+    public static final EntityType<TriopsEntity> TRIOPS = register(
+        "triops",
+        FabricEntityTypeBuilder.create(SpawnGroup.WATER_CREATURE, TriopsEntity::new)
+            .dimensions(EntityDimensions.fixed(0.35f, 0.25f))
+            .build()
+    );
+
+    /**
+     * Hummingbird entity - tiny flying bird (Epic 03).
+     */
+    public static final EntityType<HummingbirdEntity> HUMMINGBIRD = register(
+        "hummingbird",
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, HummingbirdEntity::new)
+            .dimensions(EntityDimensions.fixed(0.3f, 0.3f))
+            .build()
+    );
+
+    /**
+     * Mudskipper entity - amphibious fish (Epic 03).
+     */
+    public static final EntityType<MudskipperEntity> MUDSKIPPER = register(
+        "mudskipper",
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, MudskipperEntity::new)
+            .dimensions(EntityDimensions.fixed(0.4f, 0.3f))
+            .build()
+    );
+
+    /**
+     * Blobfish entity - deep water fish (Epic 03).
+     */
+    public static final EntityType<BlobfishEntity> BLOBFISH = register(
+        "blobfish",
+        FabricEntityTypeBuilder.create(SpawnGroup.WATER_CREATURE, BlobfishEntity::new)
+            .dimensions(EntityDimensions.fixed(0.5f, 0.4f))
+            .build()
+    );
+
+    /**
+     * Crow entity - intelligent corvid bird with flying and ground movement (Epic 03).
+     *
+     * <p>The crow is a medium-sized bird entity that exhibits both aerial and ground-based behavior.
+     * Unlike purely flying entities, crows can walk on the ground, land to rest, and take flight
+     * when needed. They are intelligent birds that can be tempted with seeds.
+     *
+     * <p><b>Dimensions:</b> 0.5 blocks wide × 0.7 blocks tall (medium bird)
+     *
+     * <p><b>Spawn Group:</b> CREATURE (passive flying animal)
+     *
+     * <p><b>Registry Name:</b> {@code xeenaa-alexs-mobs:crow}
+     *
+     * <p><b>Summon Command:</b> {@code /summon xeenaa-alexs-mobs:crow}
+     *
+     * <p><b>Characteristics:</b>
+     * <ul>
+     *   <li>Health: 6 HP (3 hearts)</li>
+     *   <li>Ground Speed: 0.25 blocks/tick (standard passive mob)</li>
+     *   <li>Flying Speed: 0.4 blocks/tick (moderate aerial movement)</li>
+     *   <li>Behavior: Ground walking, flying, landing, fleeing from threats</li>
+     *   <li>Breeding: Tempted by seeds (wheat, beetroot, melon, pumpkin)</li>
+     * </ul>
+     *
+     * @see CrowEntity
+     */
+    public static final EntityType<CrowEntity> CROW = register(
+        "crow",
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, CrowEntity::new)
+            .dimensions(EntityDimensions.fixed(0.5f, 0.7f))
+            .build()
+    );
+
     // Future entities will be added here following the pattern above
     // Examples: ALLIGATOR, ANACONDA, ANTEATER, BALD_EAGLE, etc.
 
@@ -158,6 +247,12 @@ public class ModEntities {
         // Register entity attributes here
         FabricDefaultAttributeRegistry.register(TEST_ANIMAL, TestAnimalEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(FLY, FlyEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(COCKROACH, CockroachEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(TRIOPS, TriopsEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(HUMMINGBIRD, HummingbirdEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(MUDSKIPPER, MudskipperEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(BLOBFISH, BlobfishEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(CROW, CrowEntity.createAttributes());
 
         // Future attribute registrations will be added here as entities are implemented
         // This ensures entities have proper attributes (health, speed, armor, etc.)

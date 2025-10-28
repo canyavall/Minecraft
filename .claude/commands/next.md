@@ -13,7 +13,7 @@ You are the planning-agent. Execute the /next command workflow:
    - coding-standards skill (shared standards)
    - {{project}}/.claude/project.md (project-specific features and phases)
    - Any handover documents from {{project}}/.claude/research/ or {{project}}/.claude/temp/
-6. Invoke the assigned agent (implementation-agent, validation-agent, or research-agent) with:
+6. Invoke the assigned agent (implementation-agent or research-agent) with:
    - Complete task description
    - All required context files
    - Clear goals and acceptance criteria

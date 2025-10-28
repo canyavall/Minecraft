@@ -133,7 +133,7 @@ public class FlyModel extends GeoModel<FlyEntity> {
      */
     @Override
     public Identifier getModelResource(FlyEntity entity) {
-        return Identifier.of("xeenaa-alexs-mobs", "geo/fly.geo.json");
+        return Identifier.of("xeenaa-alexs-mobs", "geo/fly_citadel.geo.json");
     }
 
     /**
@@ -175,7 +175,7 @@ public class FlyModel extends GeoModel<FlyEntity> {
      */
     @Override
     public Identifier getTextureResource(FlyEntity entity) {
-        return Identifier.of("xeenaa-alexs-mobs", "textures/entity/fly.png");
+        return Identifier.of("xeenaa-alexs-mobs", "textures/entity/fly/fly.png");
     }
 
     /**
@@ -233,6 +233,6 @@ public class FlyModel extends GeoModel<FlyEntity> {
      */
     @Override
     public Identifier getAnimationResource(FlyEntity entity) {
-        return Identifier.of("xeenaa-alexs-mobs", "animations/fly.animation.json");
+        return Identifier.of("xeenaa-alexs-mobs", "animations/fly_citadel.animation.json");
     }
 }
