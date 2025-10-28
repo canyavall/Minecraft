@@ -375,7 +375,7 @@ public void loadGuardData() {
 2. ✅ **During coding**: Write tests for new feature incrementally
 3. ✅ **After coding**: Run all tests, ensure none broke
 4. ✅ **Request user validation**: User tests manually
-5. ⏸️ **STOP**: Wait for validation-agent to write comprehensive test suite
+5. ⏸️ **STOP**: After user validation, implementation-agent writes comprehensive test suite
 
 **When fixing bug**:
 1. ✅ **Write test** that reproduces bug
@@ -385,7 +385,7 @@ public void loadGuardData() {
 5. ✅ **Add to regression suite**
 6. ✅ **Run all tests** (ensure fix didn't break anything)
 
-### For validation-agent
+### For implementation-agent (Testing Phase)
 
 **When writing test suite** (AFTER user validates manually):
 
@@ -469,7 +469,7 @@ Use this skill when:
 - **Implementing new features** - Ensure tests exist before modifying code
 - **Modifying existing code** - Prevent regressions
 - **Fixing bugs** - Write regression test to prevent recurrence
-- **validation-agent writing tests** - Comprehensive test strategy
+- **implementation-agent writing tests** - Comprehensive test strategy
 - **Code reviews** - Check for adequate test coverage
 - **Questions about testing strategy**
 - **Preventing "Feature B breaks Feature A" scenarios**

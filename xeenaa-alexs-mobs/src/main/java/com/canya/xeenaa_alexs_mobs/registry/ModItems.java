@@ -143,6 +143,37 @@ public class ModItems {
     );
 
     /**
+     * Spawn egg for the Crow entity (Epic 07).
+     *
+     * <p>This spawn egg can be used to spawn Crow entities in the world. The egg
+     * represents a crow egg with dark black coloring and gray highlights.
+     *
+     * <p><b>Colors:</b>
+     * <ul>
+     *   <li>Primary (base): {@code 0x1F1F1F} (dark gray/black - crow body)</li>
+     *   <li>Secondary (spots): {@code 0x3D3D3D} (lighter gray - highlights)</li>
+     * </ul>
+     *
+     * <p><b>Registry Name:</b> {@code xeenaa-alexs-mobs:crow_spawn_egg}
+     *
+     * <p><b>Display Name:</b> "Crow Spawn Egg" (from en_us.json)
+     *
+     * <p><b>Usage:</b> Available in the creative inventory under the
+     * "Xeenaa's Alex's Mobs" tab. Right-click to spawn a Crow entity.
+     *
+     * <p><b>Spawned Entity:</b> Creates a {@link com.canya.xeenaa_alexs_mobs.entity.animal.CrowEntity}
+     * with flying AI, tameable with Pumpkin Seeds, and capable of gathering items.
+     *
+     * @see ModEntities#CROW
+     * @see com.canya.xeenaa_alexs_mobs.entity.animal.CrowEntity
+     */
+    public static final Item CROW_SPAWN_EGG = register(
+        "crow_spawn_egg",
+        new SpawnEggItem(ModEntities.CROW, 0x1F1F1F, 0x3D3D3D,
+            new Item.Settings())
+    );
+
+    /**
      * Spawn egg for the Hummingbird entity (Epic 03).
      */
     public static final Item HUMMINGBIRD_SPAWN_EGG = register(
@@ -236,6 +267,7 @@ public class ModItems {
                     entries.add(FLY_SPAWN_EGG);
                     entries.add(COCKROACH_SPAWN_EGG);
                     entries.add(TRIOPS_SPAWN_EGG);
+                    entries.add(CROW_SPAWN_EGG);
                     entries.add(HUMMINGBIRD_SPAWN_EGG);
                     entries.add(MUDSKIPPER_SPAWN_EGG);
                     entries.add(BLOBFISH_SPAWN_EGG);

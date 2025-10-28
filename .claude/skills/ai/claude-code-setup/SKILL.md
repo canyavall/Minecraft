@@ -152,27 +152,120 @@ Brief description
 - **Clear Metadata**: Accurate tags and description
 - **No Duplication**: Reference other skills, don't repeat content
 
-## File Locations
+## File Locations & Configuration Files (2025)
+
+### Required Configuration Files
 
 ```
 .claude/
-├── agents/              # Agent configurations
-│   ├── spec-agent.md
+├── settings.json              # ✅ Team-shared settings (version controlled)
+├── settings.local.json        # ✅ Personal settings (gitignored)
+├── CLAUDE.md                  # ✅ Project instructions and overview
+├── current_project.txt        # Project-specific: Active project tracker
+├── agents/                    # Agent configurations
+│   ├── epic-agent.md
 │   ├── planning-agent.md
 │   ├── implementation-agent.md
-│   └── validation-agent.md
-├── commands/            # User commands
-│   ├── create-spec.md
-│   ├── create-plan.md
-│   └── start-plan.md
-├── skills/              # Knowledge packages
-│   ├── core/           # Essential patterns
-│   ├── libraries/      # Library usage
-│   ├── quality/        # Testing patterns
-│   ├── process/        # Workflows
-│   └── ai/             # Meta skills
-└── CLAUDE.md           # Project overview
+│   ├── research-agent.md
+│   ├── project-agent.md
+│   └── ai-agent.md
+├── commands/                  # User slash commands
+│   ├── create_epic.md
+│   ├── create_plan.md
+│   ├── next.md
+│   ├── fix.md
+│   ├── research.md
+│   ├── serve_client.md
+│   ├── create_project.md
+│   └── ai.md
+├── skills/                    # Knowledge packages (auto-loaded)
+│   ├── minecraft/            # Domain-specific
+│   ├── java/                 # Language-specific
+│   ├── process/              # Workflow patterns
+│   └── ai/                   # Meta skills
+└── knowledge/                 # Centralized research (optional)
+    ├── knowledge-index.json
+    ├── README.md
+    └── [research files]
+
+# Optional files
+.mcp.json                      # ⚠️ Model Context Protocol config (if using MCP servers)
 ```
+
+### Configuration File Purposes
+
+**settings.json** (Team-shared):
+- Permissions (allow/deny/ask)
+- Model selection
+- Tool behavior
+- Environment variables
+- Plugin configuration
+- Checked into source control
+
+**settings.local.json** (Personal):
+- Personal overrides
+- Local development settings
+- Automatically gitignored by Claude Code
+- NOT checked into source control
+
+**.mcp.json** (Optional):
+- Model Context Protocol server configuration
+- Extends Claude Code with external tools
+- Project-level MCP servers
+
+**CLAUDE.md**:
+- Project overview and instructions
+- Agent responsibilities
+- Workflow patterns
+- Command documentation
+
+### What's New in 2025
+
+**Configuration Changes**:
+- ✅ `settings.json` and `settings.local.json` are now the standard (replacing older `config.json`)
+- ✅ `.mcp.json` added for Model Context Protocol server configuration
+- ✅ Plugin marketplace support via `enabledPlugins` in settings.json
+- ✅ Agent skills system with YAML frontmatter
+- ✅ Hierarchical settings: user (`~/.claude/settings.json`) → project (`.claude/settings.json`) → local (`.claude/settings.local.json`)
+
+**Deprecated/Legacy**:
+- ❌ `config.json` - Use `settings.json` instead
+- ❌ `~/.claude.json` - Use `~/.claude/settings.json` instead (though some docs mention both for compatibility)
+
+### Configuration Best Practices
+
+**1. Settings Hierarchy**:
+```
+User settings (~/.claude/settings.json)
+  ↓ (overridden by)
+Project settings (.claude/settings.json)
+  ↓ (overridden by)
+Local settings (.claude/settings.local.json)
+```
+
+**2. What Goes Where**:
+
+**settings.json** (team-shared):
+- Baseline permissions everyone needs
+- Project-wide tool access patterns
+- Standard model configurations
+- Shared environment variables
+
+**settings.local.json** (personal):
+- Personal API keys
+- Local development overrides
+- Experimental settings
+- Machine-specific paths
+
+**3. Security Best Practices**:
+- ALWAYS add `.claude/settings.local.json` to `.gitignore`
+- NEVER commit API keys or secrets
+- Use `permissions.deny` to block sensitive files (`.env`, `credentials.json`, etc.)
+
+**4. MCP Server Configuration** (Optional):
+- Use `.mcp.json` for project-level MCP servers
+- Place in project root (same level as `.claude/`)
+- Version control if team needs same MCP servers
 
 ## Common Patterns
 
@@ -225,7 +318,7 @@ You create specifications.
 
 # Correct
 You ONLY create requirements.md files from ticket.md or user prompts.
-You DO NOT create plans (planning-agent), write code (implementation-agent), or write tests (validation-agent).
+You DO NOT create plans (planning-agent) or write code and tests (implementation-agent).
 ```
 
 ### ❌ Missing Validation

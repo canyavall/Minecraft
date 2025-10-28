@@ -316,9 +316,8 @@ Execute the next TODO task from the current epic.
 ### 2. Determine Agent
 
 Based on task's assigned agent:
-- `implementation-agent`: Invoke for code implementation
+- `implementation-agent`: Invoke for code implementation and testing tasks
 - `research-agent`: Invoke for research tasks
-- `validation-agent`: Invoke for testing tasks
 
 ### 3. Invoke Agent
 
@@ -887,8 +886,8 @@ Invoke research-agent with [context]
 **For implementation tasks**:
 Invoke implementation-agent with [context]
 
-**For validation tasks**:
-Invoke validation-agent with [context]
+**For testing tasks**:
+Invoke implementation-agent with [context] (testing phase after user validation)
 
 Coordinate results and report to user.
 ```

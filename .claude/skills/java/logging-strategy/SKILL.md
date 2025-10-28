@@ -575,9 +575,9 @@ When implementing a new feature, ensure logging for:
 **DO NOT wait for**:
 - User to request logging
 - Bug to occur
-- validation-agent to add logging
+- implementation-agent to add logging during testing phase
 
-### validation-agent Responsibilities
+### implementation-agent Testing Responsibilities
 
 **When writing tests**:
 1. ✅ Verify logging occurs at appropriate points

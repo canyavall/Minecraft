@@ -216,10 +216,9 @@ Use consistent colors for agent types:
 |-------|------------|----------|
 | **blue** | Planning/Orchestration | planning-agent, project-agent |
 | **green** | Specification/Requirements | epic-agent |
-| **red** | Validation/Testing | validation-agent |
 | **purple** | Meta/Infrastructure | ai-agent |
 | **yellow** | Research/Investigation | research-agent |
-| **(default)** | Implementation | implementation-agent |
+| **(default)** | Implementation & Testing | implementation-agent |
 
 **Why**: Visual distinction in Claude Code UI, easier to identify agent types.
 
@@ -244,8 +243,7 @@ Use consistent colors for agent types:
 
 **You DO NOT**:
 - ❌ Create technical tasks (planning-agent)
-- ❌ Write code (implementation-agent)
-- ❌ Write tests (validation-agent)
+- ❌ Write code or tests (implementation-agent)
 ```
 
 ### Pattern 2: Planning Agent
@@ -267,8 +265,7 @@ Use consistent colors for agent types:
 
 **You DO NOT**:
 - ❌ Write business requirements (epic-agent)
-- ❌ Implement tasks (implementation-agent)
-- ❌ Create tests (validation-agent)
+- ❌ Implement tasks or write tests (implementation-agent)
 ```
 
 ### Pattern 3: Implementation Agent
@@ -291,32 +288,11 @@ Use consistent colors for agent types:
 **You DO NOT**:
 - ❌ Create requirements (epic-agent)
 - ❌ Create task plans (planning-agent)
-- ❌ Write tests (validation-agent does after user validation)
+
+**You ALSO write**: Tests after user manual validation confirms features work
 ```
 
-### Pattern 4: Validation Agent
-
-**Purpose**: Quality assurance and testing
-
-**Characteristics**:
-- Creates tests AFTER user manual validation
-- Defines QA procedures
-- Never writes implementation code
-
-**Example**: validation-agent
-
-```markdown
-## CRITICAL: Your ONLY Responsibility
-
-**You ONLY create**: Tests and QA procedures
-
-**You DO NOT**:
-- ❌ Write implementation code (implementation-agent)
-- ❌ Create requirements (epic-agent)
-- ❌ Create task plans (planning-agent)
-```
-
-### Pattern 5: Meta Agent
+### Pattern 4: Meta Agent
 
 **Purpose**: Manages the AI infrastructure itself
 
@@ -372,8 +348,7 @@ planning-agent receives complex task
 planning-agent analyzes requirements
   ↓
   ├─→ research-agent: Investigates unknowns
-  ├─→ implementation-agent: Implements known parts
-  └─→ validation-agent: Prepares test strategy
+  └─→ implementation-agent: Implements known parts and writes tests
   ↓
 Results converge
   ↓

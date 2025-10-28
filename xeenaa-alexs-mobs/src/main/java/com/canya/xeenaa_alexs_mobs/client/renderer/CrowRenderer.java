@@ -6,6 +6,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.joml.Quaternionf;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 /**
@@ -142,43 +143,6 @@ public class CrowRenderer extends GeoEntityRenderer<CrowEntity> {
         this.shadowRadius = 0.3f;
     }
 
-    /**
-     * Gets the texture location for rendering the crow entity.
-     *
-     * <p>This method is called by GeckoLib every frame to determine which texture
-     * to apply to the crow model. It delegates to {@link CrowModel#getTextureResource(CrowEntity)}
-     * to maintain consistency between model and renderer.
-     *
-     * <p><b>Texture Path:</b>
-     * {@code assets/xeenaa-alexs-mobs/textures/entity/crow/crow.png}
-     *
-     * <p><b>Current Implementation:</b> All crows use the same texture (black corvid).
-     *
-     * <p><b>Future Enhancement:</b> This method could return different textures based
-     * on entity state or variants:
-     * <pre>{@code
-     * @Override
-     * public Identifier getTextureLocation(CrowEntity entity) {
-     *     if (entity.isBaby()) {
-     *         return Identifier.of("xeenaa-alexs-mobs",
-     *             "textures/entity/crow/crow_baby.png");
-     *     }
-     *     if (entity.isAlbino()) {
-     *         return Identifier.of("xeenaa-alexs-mobs",
-     *             "textures/entity/crow/crow_albino.png");
-     *     }
-     *     return super.getTextureLocation(entity);
-     * }
-     * }</pre>
-     *
-     * <p><b>Performance Note:</b> This method is called every frame during rendering.
-     * The Identifier is constant, so no allocation occurs. GeckoLib caches the loaded
-     * texture, so file I/O only happens once at startup.
-     *
-     * @param entity the crow entity being rendered
-     * @return the resource identifier for the crow's texture file
-     * @see CrowModel#getTextureResource(CrowEntity)
-     */
     @Override
     public Identifier getTextureLocation(CrowEntity entity) {
         return Identifier.of("xeenaa-alexs-mobs", "textures/entity/crow/crow.png");
@@ -203,13 +167,80 @@ public class CrowRenderer extends GeoEntityRenderer<CrowEntity> {
                        VertexConsumerProvider bufferSource, int packedLight) {
         poseStack.push();
 
+        // COMPREHENSIVE LOGGING - Log every 10 ticks (0.5 seconds) for better tracking
+        if (entity.age % 10 == 0) {
+            System.out.println("\n╔════════════════════════════════════════════════════════════╗");
+            System.out.println("║           CROW RENDER DEBUG - Frame " + entity.age + "              ║");
+            System.out.println("╚════════════════════════════════════════════════════════════╝");
+
+            // === ENTITY POSITION ===
+            System.out.println("\n[POSITION]");
+            System.out.println("  World: X=" + String.format("%.3f", entity.getX()) +
+                             " Y=" + String.format("%.3f", entity.getY()) +
+                             " Z=" + String.format("%.3f", entity.getZ()));
+            System.out.println("  OnGround: " + entity.isOnGround());
+
+            // === ENTITY ROTATION ===
+            System.out.println("\n[ROTATION - Entity Values]");
+            System.out.println("  Pitch: " + String.format("%.2f", entity.getPitch()) + "° (up/down tilt)");
+            System.out.println("  Yaw: " + String.format("%.2f", entity.getYaw()) + "° (facing direction)");
+            System.out.println("  Render Yaw: " + String.format("%.2f", entityYaw) + "° (interpolated)");
+            System.out.println("  Body Yaw: " + String.format("%.2f", entity.bodyYaw) + "°");
+            System.out.println("  Head Yaw: " + String.format("%.2f", entity.headYaw) + "°");
+            System.out.println("  Prev Yaw: " + String.format("%.2f", entity.prevYaw) + "°");
+
+            // === VELOCITY ===
+            System.out.println("\n[VELOCITY]");
+            System.out.println("  X: " + String.format("%.4f", entity.getVelocity().x));
+            System.out.println("  Y: " + String.format("%.4f", entity.getVelocity().y) +
+                             (entity.getVelocity().y > 0 ? " (rising)" : entity.getVelocity().y < 0 ? " (falling)" : " (level)"));
+            System.out.println("  Z: " + String.format("%.4f", entity.getVelocity().z));
+            System.out.println("  Speed: " + String.format("%.4f", Math.sqrt(
+                entity.getVelocity().x * entity.getVelocity().x +
+                entity.getVelocity().y * entity.getVelocity().y +
+                entity.getVelocity().z * entity.getVelocity().z)));
+
+            // === ANIMATION STATE ===
+            System.out.println("\n[ANIMATION STATE]");
+            System.out.println("  Age: " + entity.age + " ticks");
+            System.out.println("  Flying: " + !entity.isOnGround());
+            System.out.println("  Moving: " + (entity.getVelocity().lengthSquared() > 0.001));
+
+            // === CALCULATED ANGLES ===
+            System.out.println("\n[CALCULATED ANGLES]");
+            double horizontalSpeed = Math.sqrt(
+                entity.getVelocity().x * entity.getVelocity().x +
+                entity.getVelocity().z * entity.getVelocity().z);
+            double totalSpeed = entity.getVelocity().length();
+            double calculatedPitch = totalSpeed > 0.001 ?
+                Math.toDegrees(Math.atan2(entity.getVelocity().y, horizontalSpeed)) : 0;
+            System.out.println("  Calculated Pitch (from velocity): " + String.format("%.2f", calculatedPitch) + "°");
+            System.out.println("  Yaw Change (from prev): " + String.format("%.2f", entity.getYaw() - entity.prevYaw) + "°");
+
+            // === RENDERER TRANSFORMATIONS ===
+            System.out.println("\n[RENDERER TRANSFORMATIONS]");
+            System.out.println("  1. Scale: 0.8x (all axes)");
+            System.out.println("  2. Rotations: NONE (testing natural)");
+            System.out.println("  Note: Model has baked 57.5° X-rotation in geo.json");
+
+            // === VISUAL EXPECTATIONS ===
+            System.out.println("\n[EXPECTED VISUAL]");
+            if (!entity.isOnGround()) {
+                System.out.println("  Should be: Flying horizontally (laying flat)");
+                System.out.println("  Turning: Entity yaw should rotate model around vertical axis");
+            } else {
+                System.out.println("  Should be: On ground (maybe walking)");
+            }
+
+            System.out.println("\n" + "═".repeat(60) + "\n");
+        }
+
         // Scale the model to appropriate size (crows are medium-sized birds)
-        // Original Citadel model may need scaling to match hitbox
         poseStack.scale(0.8f, 0.8f, 0.8f);
 
-        // Translate down to ground level (Citadel models use Y=24 as pivot, we need Y=0)
-        // Adjusted for the 0.8 scale factor
-        poseStack.translate(0, -1.5, 0);
+        // Y-axis 180° fixes backwards flying (CONFIRMED WORKING)
+        // Issue: Legs on top, head on bottom (needs additional rotation)
+        poseStack.multiply(new Quaternionf().rotateY((float) Math.PI));
 
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.pop();

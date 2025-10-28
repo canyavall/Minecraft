@@ -576,7 +576,7 @@ public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 3. Document any deviations and reasons
 4. Store screenshots in `{{project}}/.claude/temp/` for user review
 
-### For validation-agent (Testing Phase)
+### For implementation-agent (Testing Phase)
 
 **UI Testing Checklist**:
 - [ ] Screen opens correctly

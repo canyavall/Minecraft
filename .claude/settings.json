@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:spark.lucko.me)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:modrinth.com)",
+      "Bash(curl:*)",
+      "Bash(gradle --version)",
+      "Bash(gradle build:*)",
+      "Bash(gradle:*)",
+      "Bash(find:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Bash(./gradlew:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

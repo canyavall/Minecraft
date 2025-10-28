@@ -67,12 +67,17 @@
 
 **Animal**: Flying Passive Bird (Tameable)
 **Status**: Bug fixes → Feature completion
-**Progress**: 1/12 tasks complete
+**Progress**: 6/16 tasks complete (38%)
 
 **Current State**:
-- ✅ Partial implementation (entity, model, animations, renderer)
-- ✅ TASK-001: Texture rendering fix applied (needs user validation)
-- ❌ Missing spawn egg
+- ✅ Entity, model, animations, renderer implemented
+- ✅ TASK-001: Texture rendering fixed (getTextureLocation direct return)
+- ✅ TASK-002: Spawn egg created (dark gray/black colors, in creative tab)
+- ✅ TASK-001.1: Crow orientation fixed (180° Y-rotation applied)
+- ✅ TASK-001.2: Crow body pitch fixed (-90° X-rotation for vertical orientation)
+- ✅ TASK-001.3: Crow spawning/underground flight fixed (Y-translation changed from -1.5 to +0.3)
+- ✅ TASK-001.4: Dynamic pitch fixed (counters entity pitch to keep model upright)
+- ❌ Spawn egg texture missing (reported but not yet task-tracked)
 - ❌ Missing taming system (Pumpkin Seeds)
 - ❌ Missing command modes (Stay/Wander/Follow/Gather)
 - ❌ Missing shoulder perching
@@ -81,8 +86,8 @@
 
 **Plan**: `xeenaa-alexs-mobs/.claude/epics/007-crow-flying-passive-bird/plan.md`
 
-**Last Completed**: TASK-001 - Fix Crow Texture Rendering ✅
-**Next Task**: TASK-002 - Create Crow Spawn Egg (awaiting user validation of TASK-001)
+**Last Completed**: TASK-001.4 - Fix Dynamic Pitch ✅
+**Next Task**: TASK-003 - Validate Basic Crow Functionality (manual testing required)
 
 ---
 

@@ -65,16 +65,22 @@ The skill provides the complete template - use it.
   - Add task count and progress tracking
   - Do NOT set as active epic yet (user needs to confirm)
 
-### 8. Request User Confirmation
+### 8. Ask User About Starting Work
 
 **STOP and ASK USER**:
 - "I've created [X] tasks for this epic"
-- "Should this epic become the ACTIVE epic now?"
-- "Or should it wait while we finish current epic [##]?"
+- Display task overview (phases, key tasks)
+- "Would you like to start working on this plan now?"
 
-After user confirms:
-- Update CURRENT_EPIC.md with the active epic
-- Report completion and next steps
+**If YES**:
+- Update CURRENT_EPIC.md to set this epic as ACTIVE
+- Automatically invoke `/next` command to start first task
+- Continue workflow seamlessly
+
+**If NO**:
+- Update CURRENT_EPIC.md with status "READY" (but not active)
+- Tell user they can run `/next` manually when ready
+- If there's another active epic, tell them to finish it first or switch
 
 ## Important Rules
 

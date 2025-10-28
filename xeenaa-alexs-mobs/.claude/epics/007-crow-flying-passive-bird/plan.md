@@ -3,7 +3,7 @@
 **Epic**: Crow - Flying Passive Bird
 **Status**: IN PROGRESS (Bug fixes → Feature completion)
 **Complexity**: Medium
-**Total Tasks**: 12
+**Total Tasks**: 16 (12 main tasks + 4 sub-tasks)
 
 ---
 
@@ -33,12 +33,12 @@ This epic has **partial implementation** with known bugs and missing features. T
 
 ### TASK-001: Fix Crow Texture Rendering
 
-**Status**: IN_PROGRESS (Partial fix attempted, still black)
+**Status**: COMPLETED
 **Priority**: CRITICAL
 **Assigned**: implementation-agent
 **Estimated**: 1-2 hours
 **Complexity**: Medium
-**Attempt 1**: 2025-10-27 - Added render transformations, texture still black in-game
+**Completed**: 2025-10-28 - Fixed getTextureLocation() to return Identifier directly
 
 **Description**:
 Crow currently renders completely black in-game despite texture file existing. Need to diagnose and fix texture loading/rendering issue.
@@ -80,14 +80,316 @@ Crow currently renders completely black in-game despite texture file existing. N
 
 ---
 
+### TASK-001.1: Fix - Crow Flies Backwards (180° Orientation Wrong)
+
+**Status**: COMPLETED
+**Priority**: HIGH
+**Assigned**: implementation-agent
+**Estimated**: 30 minutes - 1 hour
+**Complexity**: Simple
+**Completed**: 2025-10-28 - Added 180° Y-axis rotation in CrowRenderer
+**Related Task**: TASK-001 (Texture Rendering Fix)
+
+**Description**:
+Bug reported during testing: Crow flies tail-first instead of head-first. The entity orientation is 180 degrees backwards - the tail is where the head should be and vice versa.
+
+**Bug Details**:
+- **Symptoms**: Crow flies with its tail/butt facing forward instead of its head/beak
+- **Expected behavior**: Crow should fly head-first (beak pointing in direction of travel)
+- **Actual behavior**: Crow flies backwards (tail pointing in direction of travel)
+- **Root cause**: Likely renderer transformation issue (180° rotation needed) or model pivot orientation
+
+**Investigation Required**:
+1. Check CrowRenderer.render() method for rotation transformations
+2. Compare with working examples (FlyRenderer applies 180° flip with `rotateZ`)
+3. Verify model pivot orientation in crow.geo.json
+4. Test if adding 180° Y-axis rotation fixes orientation
+
+**Files to Check**:
+- `xeenaa-alexs-mobs/src/main/java/com/canya/xeenaa_alexs_mobs/client/renderer/CrowRenderer.java` (render method lines 164-179)
+- Compare with `FlyRenderer.java` (line 169: rotateZ 180°)
+
+**Likely Solution**:
+Add 180° rotation around Y-axis in CrowRenderer.render() method:
+```java
+// After scale and translate transformations
+poseStack.multiply(new Quaternionf().rotateY((float) Math.PI));  // Rotate 180° around Y
+```
+
+**Goal**:
+Fix crow orientation so it flies head-first in the direction of movement.
+
+**Requirements**:
+- [ ] Investigate which axis needs rotation (Y-axis most likely for forward/backward)
+- [ ] Add rotation transformation to CrowRenderer.render()
+- [ ] Test that crow flies head-first
+- [ ] Ensure crow still renders at correct height and scale
+- [ ] Verify no other orientations broken (walking, sitting, idle)
+
+**Guidelines and Resources**:
+- `coding-standards skill` - Code standards
+- `FlyRenderer.java` - Working example (uses rotateZ for upside-down flip)
+- CrowRenderer already has scale (0.8f) and translate (0, -1.5, 0)
+
+**Acceptance Criteria**:
+- [ ] Crow flies with head/beak pointing forward
+- [ ] Crow's tail faces backwards when flying
+- [ ] Movement direction matches visual orientation
+- [ ] No new visual glitches introduced
+- [ ] User validates the fix in-game
+
+**Dependencies**:
+- TASK-001 must be completed (texture rendering - already done)
+
+**Blockers**:
+- None
+
+**Notes**:
+- This is a rendering orientation fix for TASK-001
+- FlyRenderer uses rotateZ (upside-down), but crow needs rotateY (backwards)
+- Quick fix - should take 30 minutes to 1 hour
+
+---
+
+### TASK-001.2: Fix - Crow Head/Body Pitch Wrong (Horizontal Instead of Vertical)
+
+**Status**: COMPLETED
+**Priority**: HIGH
+**Assigned**: implementation-agent
+**Estimated**: 30 minutes - 1 hour
+**Complexity**: Simple
+**Completed**: 2025-10-28 - Added 90° X-axis rotation in CrowRenderer
+**Related Task**: TASK-001.1 (Backwards Orientation Fix)
+
+**Description**:
+Bug reported during testing: Crow's body is horizontal (laying flat) when it should be vertical (head up, legs down). The crow flies correctly forward now, but its body orientation is rotated 90 degrees wrong on the pitch axis.
+
+**Bug Details**:
+- **Symptoms**: Crow's head points horizontally (parallel to ground), legs point horizontally
+- **Expected behavior**: Crow should fly upright (head up, body vertical, legs down)
+- **Actual behavior**: Crow flies laying flat/horizontal like it's on its side
+- **Root cause**: Missing pitch rotation (likely needs 90° X-axis rotation)
+
+**Investigation Required**:
+1. Check if model needs X-axis rotation (pitch) to stand upright
+2. Compare with FlyRenderer which may have similar pitch adjustments
+3. Verify if this is model-specific or renderer transformation issue
+4. Test different pitch angles (90°, -90°, or different axis)
+
+**Files to Check**:
+- `CrowRenderer.java` (render method - add pitch rotation)
+- `FlyRenderer.java` (check if it has pitch/roll rotations)
+- `crow.geo.json` (verify model pivot orientation)
+
+**Likely Solution**:
+Add X-axis (pitch) rotation in CrowRenderer.render() method:
+```java
+// After Y-rotation for forward/backward orientation
+poseStack.multiply(new Quaternionf().rotateX((float) Math.PI / 2));  // Rotate 90° on X for upright
+// OR
+poseStack.multiply(new Quaternionf().rotateX(-(float) Math.PI / 2));  // Try -90° if wrong direction
+```
+
+**Goal**:
+Fix crow's body pitch so it flies upright (head up, legs down) like a normal bird.
+
+**Requirements**:
+- [ ] Investigate which axis needs rotation (X for pitch, Z for roll)
+- [ ] Add pitch rotation to CrowRenderer.render()
+- [ ] Test that crow stands/flies upright
+- [ ] Ensure crow still flies forward (don't break TASK-001.1 fix)
+- [ ] Verify head points up and legs point down
+
+**Guidelines and Resources**:
+- `coding-standards skill` - Code standards
+- `FlyRenderer.java` - Check for pitch/roll rotations
+- Current rotations: scale (0.8f), translate (0, -1.5, 0), rotateY (180°)
+
+**Acceptance Criteria**:
+- [ ] Crow's head points upward when flying
+- [ ] Crow's legs point downward when flying
+- [ ] Crow looks like a normal bird (not laying flat)
+- [ ] Forward orientation still works (from TASK-001.1)
+- [ ] User validates the fix in-game
+
+**Dependencies**:
+- TASK-001.1 must be completed (forward orientation - already done)
+
+**Blockers**:
+- None
+
+**Notes**:
+- This is additional rotation fix after TASK-001.1
+- May need to experiment with X-axis vs Z-axis rotation
+- Likely 90° or -90° rotation needed
+
+---
+
+### TASK-001.3: Fix - Crow Spawns Under Terrain and Flies Underground
+
+**Status**: COMPLETED
+**Priority**: HIGH
+**Assigned**: implementation-agent
+**Estimated**: 1-2 hours
+**Complexity**: Medium
+**Completed**: 2025-10-28 - Fixed Y-translation from -1.5 to +0.3 (moved UP instead of DOWN)
+**Related Task**: TASK-001 (Texture Rendering), TASK-001.2 (Pitch Fix)
+
+**Description**:
+Bug reported during testing: Crow sometimes spawns under terrain blocks and flies underground instead of above ground. This likely relates to the Y-translation adjustment in the renderer (-1.5 blocks) which may be affecting spawn height or hitbox positioning.
+
+**Bug Details**:
+- **Symptoms**: Crow spawns below ground level, crow flies through terrain
+- **Expected behavior**: Crow spawns at ground level, crow flies above ground avoiding terrain
+- **Actual behavior**: Crow appears underground, pathfinding allows underground flight
+- **Root cause**: Likely Y-translation in renderer or entity spawn height issue
+
+**Investigation Required**:
+1. Check CrowEntity spawn height settings (createMobAttributes)
+2. Verify renderer Y-translation doesn't affect hitbox/collision
+3. Check if flying AI has proper terrain avoidance
+4. Test spawn egg spawn height (should spawn on top of block, not inside)
+5. Compare with working flying entities (FlyEntity)
+
+**Files to Check**:
+- `CrowRenderer.java` (line 176: translate(0, -1.5, 0) - visual only?)
+- `CrowEntity.java` (spawn attributes, flying AI goals)
+- Compare with `FlyEntity.java` (working flying entity)
+
+**Likely Solutions**:
+1. **Renderer issue**: Y-translation should only affect rendering, not hitbox
+2. **Spawn height**: Ensure spawn egg spawns crow at correct Y position
+3. **AI pathfinding**: Add terrain avoidance to flying AI
+4. **Entity position**: Check if entity position needs adjustment separate from renderer
+
+**Goal**:
+Fix crow spawning and flying to ensure it stays above ground.
+
+**Requirements**:
+- [ ] Investigate root cause (renderer vs entity position vs AI)
+- [ ] Fix spawn height if spawn egg places crow underground
+- [ ] Ensure flying AI avoids terrain
+- [ ] Verify renderer Y-translation doesn't affect hitbox
+- [ ] Test in various terrain (flat, hills, caves)
+
+**Guidelines and Resources**:
+- `coding-standards skill` - Code standards
+- `FlyEntity.java` - Working flying entity reference
+- Renderer transformations should be visual only (not affect collision)
+
+**Acceptance Criteria**:
+- [ ] Crow spawns at correct ground level (on top of blocks)
+- [ ] Crow flies above ground, not through terrain
+- [ ] Flying pathfinding avoids underground areas
+- [ ] Hitbox collision works correctly
+- [ ] User validates crow no longer clips underground
+
+**Dependencies**:
+- TASK-001 and TASK-001.2 must be completed
+
+**Blockers**:
+- None
+
+**Notes**:
+- This is a critical bug affecting basic functionality
+- May need to separate entity position from renderer visual offset
+- Check if Y-translation in renderer affects anything besides visuals
+- Flying AI may need terrain collision avoidance goals
+
+---
+
+### TASK-001.4: Fix - Crow Head Tilts Based on Movement (Dynamic Pitch Issue)
+
+**Status**: COMPLETED
+**Priority**: HIGH
+**Assigned**: implementation-agent
+**Estimated**: 1-2 hours
+**Complexity**: Medium
+**Completed**: 2025-10-28 - Added entity pitch counter to keep model upright
+**Related Task**: TASK-001.2 (Pitch Fix)
+
+**Description**:
+Bug reported during testing: Crow's head orientation changes based on movement direction. When near ground, head points down. When flying up, head points diagonally ("1 o'clock" position). The static -90° X-rotation is being combined with the entity's dynamic pitch calculation.
+
+**Bug Details**:
+- **Symptoms**: Crow's head tilts down near ground, tilts diagonally when flying up
+- **Expected behavior**: Crow should always fly upright with head pointing forward/up regardless of movement direction
+- **Actual behavior**: Head orientation changes dynamically based on entity pitch
+- **Root cause**: Entity's natural pitch (based on movement) combines with renderer's static -90° X-rotation
+
+**Investigation Required**:
+1. Check if entity has dynamic pitch calculation based on velocity
+2. Compare with FlyEntity - does it have same issue?
+3. Determine if we need to counter the entity's pitch in renderer
+4. Check if we should disable entity pitch updates for flying birds
+
+**Files to Check**:
+- `CrowRenderer.java` (render method with rotations)
+- `CrowEntity.java` (check for pitch calculations, setXRot/getXRot)
+- `FlyEntity.java` (compare flying entity pitch behavior)
+
+**Likely Solutions**:
+1. **Counter entity pitch**: Apply opposite rotation to cancel entity's pitch
+   ```java
+   // Counter the entity's pitch so model stays upright
+   float entityPitch = entity.getXRot(); // Entity's current pitch
+   poseStack.multiply(new Quaternionf().rotateX(-entityPitch * ((float)Math.PI / 180F)));
+   ```
+
+2. **Disable entity pitch**: Override entity's pitch calculation to always be 0
+   ```java
+   // In CrowEntity.java
+   @Override
+   public void setXRot(float pitch) {
+       super.setXRot(0); // Always keep level
+   }
+   ```
+
+3. **Alternative rotation approach**: Use different rotation order or axis
+
+**Goal**:
+Fix crow's head orientation to stay upright regardless of movement direction.
+
+**Requirements**:
+- [ ] Investigate entity pitch calculation
+- [ ] Test solution with different movement directions (up, down, level)
+- [ ] Ensure crow always appears upright
+- [ ] Verify fix doesn't affect other animations
+
+**Guidelines and Resources**:
+- `coding-standards skill` - Code standards
+- Entity pitch: getXRot() returns degrees, needs conversion to radians
+- FlyRenderer - check if it has similar pitch handling
+
+**Acceptance Criteria**:
+- [ ] Crow head stays forward/up when near ground
+- [ ] Crow head stays forward/up when flying upward
+- [ ] Crow head orientation is consistent regardless of movement
+- [ ] No visual glitches during direction changes
+- [ ] User validates crow orientation looks correct
+
+**Dependencies**:
+- TASK-001.2 must be completed (current pitch rotation)
+
+**Blockers**:
+- None
+
+**Notes**:
+- This is related to TASK-001.2 but requires dynamic pitch handling
+- May need to counter entity's natural pitch in renderer
+- Flying entities often have pitch based on velocity direction
+- Static rotation isn't enough - need to handle dynamic pitch
+
+---
+
 ### TASK-002: Create Crow Spawn Egg
 
-**Status**: TODO
+**Status**: COMPLETED
 **Priority**: CRITICAL
 **Assigned**: implementation-agent
 **Estimated**: 30 minutes
 **Complexity**: Simple
-**Dependencies**: None
+**Completed**: 2025-10-28 - Added CROW_SPAWN_EGG to ModItems with creative tab and language entry
 
 **Description**:
 Add Crow spawn egg to creative inventory so users can summon crows without commands.
@@ -1005,7 +1307,7 @@ Comprehensive user testing of all crow features to validate implementation befor
 
 **Status**: TODO
 **Priority**: LOW
-**Assigned**: validation-agent
+**Assigned**: implementation-agent
 **Estimated**: 2-3 hours
 **Complexity**: Medium
 **Dependencies**: TASK-011 (user validation complete)

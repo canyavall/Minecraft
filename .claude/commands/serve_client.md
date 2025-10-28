@@ -1,6 +1,11 @@
 ---
 description: Launch Minecraft client with the mod (builds first if needed)
+agent: planning-agent
 ---
+
+You are the planning-agent launching the Minecraft client for testing.
+
+## Your Task
 
 Launch Minecraft client with the mod. Check if built first, build if needed.
 

@@ -68,8 +68,20 @@ This file will be created by planning-agent when user runs `/create_plan`.
 Inform user:
 - Epic created: `{{project}}/.claude/epics/##-epic-name/`
 - Requirements file: `{{project}}/.claude/epics/##-epic-name/requirements.md`
-- **Next step**: User should review and validate requirements.md
-- **After validation**: Run `/create_plan` to generate technical tasks
+- Display a brief summary of what's in requirements.md (key features, goals)
+
+### 8. Ask User About Next Steps
+
+**ASK USER**: "Would you like me to generate the implementation plan (plan.md) for this epic now?"
+
+**If YES**:
+- Automatically invoke `/create_plan` command
+- Continue workflow seamlessly
+
+**If NO**:
+- Stop here
+- Tell user they can run `/create_plan` manually when ready
+- Remind user to review requirements.md first
 
 ## Important Rules
 

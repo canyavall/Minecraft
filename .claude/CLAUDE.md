@@ -307,17 +307,16 @@ Skills provide specialized workflow patterns that activate automatically based o
 
 ## Commands (User-Triggered Workflows)
 
-| Command | Purpose | Natural Language Examples |
-|---------|---------|---------------------------|
-| `/create_project <name>` | Create new mod from template | "create new project MyMod" |
-| `/create_epic <name>` | Create business requirements | "start new epic Guard System" |
-| `/create_plan` | Generate technical tasks from requirements | "create implementation plan" |
-| `/add_task <desc>` | Add task to current epic | "add task: implement GUI" |
-| `/fix <desc>` | Create bug fix sub-task | "there's a bug in spawning" |
-| `/research <question>` | Research and document findings | "research Fabric networking" |
-| `/next` | Execute next task | "work on the next task" |
-| `/serve_client` | Build and launch Minecraft | "build and launch" |
-| `/ai <desc>` | Debug/fix AI infrastructure | "the agent needs fixing" |
+| Command | Purpose | Agent | Natural Language Examples |
+|---------|---------|-------|---------------------------|
+| `/create_project <name>` | Create new mod from template | project-agent | "create new project MyMod" |
+| `/create_epic <name>` | Create business requirements | epic-agent | "start new epic Guard System" |
+| `/create_plan` | Generate technical tasks from requirements | planning-agent | "create implementation plan" |
+| `/fix <desc>` | Create fix task (sub-task or main task) | planning-agent | "there's a bug in spawning" |
+| `/research <question>` | Research and document findings | research-agent | "research Fabric networking" |
+| `/next` | Execute next task | planning-agent | "work on the next task" |
+| `/serve_client` | Build and launch Minecraft | planning-agent | "build and launch" |
+| `/ai <desc>` | Debug/fix AI infrastructure | ai-agent | "the agent needs fixing" |
 
 **Command files**: `.claude/commands/<command-name>.md`
 
@@ -330,11 +329,41 @@ Skills provide specialized workflow patterns that activate automatically based o
 
 All workflow patterns documented in **multi-project-workflow** skill. Common patterns:
 
-1. **Create Epic**: `/create_epic` → validate requirements → `/create_plan` → `/next`
-2. **Execute Tasks**: `/next` → agent works → STOP → user validates → `/next`
-3. **Fix Bug**: `/fix` → creates sub-task → `/next`
-4. **Research**: `/research` → document findings → use in implementation
-5. **Test**: `/serve_client` → manual testing → create automated tests
+### Epic Creation Workflow (Interactive)
+1. **Create Epic**: User runs `/create_epic "Epic Name"`
+2. **Epic Agent**: Creates requirements.md with business requirements
+3. **Ask User**: "Would you like me to generate the implementation plan now?"
+   - **If YES**: Automatically runs `/create_plan` → continues to step 4
+   - **If NO**: Stops, user reviews requirements.md
+4. **Planning Agent**: Creates plan.md with technical tasks
+5. **Ask User**: "Would you like to start working on this plan now?"
+   - **If YES**: Sets epic as ACTIVE, runs `/next` → starts first task
+   - **If NO**: Stops, user can run `/next` manually later
+
+### Task Execution Workflow
+1. **Execute Next**: User runs `/next` (or auto-invoked from epic creation)
+2. **Planning Agent**: Reads next TODO task from plan.md
+3. **Agent Works**: Invokes assigned agent (implementation/research)
+4. **STOP**: Agent completes, waits for user validation
+5. **User Validates**: User tests/reviews the work
+6. **Repeat**: User runs `/next` for next task
+
+### Fix Issue Workflow
+1. **Report Issue**: User runs `/fix "description of issue"`
+2. **Planning Agent Asks**: "Is this related to an existing task or standalone?"
+   - **Related**: Creates sub-task (TASK-XXX.Y)
+   - **Standalone**: Creates new main task (TASK-XXX)
+3. **Next**: User runs `/next` to execute the fix
+
+### Research Workflow
+1. **Research**: User runs `/research "question"`
+2. **Research Agent**: Investigates and documents findings
+3. **Integration**: Use findings in implementation tasks
+
+### Testing Workflow
+1. **Manual Test**: User runs `/serve_client` → tests in Minecraft
+2. **Validate**: User confirms features work correctly
+3. **Automated Tests**: implementation-agent writes test suite after validation
 
 See **multi-project-workflow** skill for detailed patterns and troubleshooting.
 
