@@ -1,4 +1,5 @@
 ---
+name: citadel-to-geckolib-conversion
 skill_name: citadel-to-geckolib-conversion
 category: minecraft
 description: Knowledge for converting Citadel-based entity models to GeckoLib format for Fabric mods
@@ -560,3 +561,17 @@ For remaining 89 mobs, refer to `mob-conversion-automation` skill for automation
 **Skill Status**: ✅ Validated (Fly entity fully working)
 **Time Savings**: 80% automation potential (45-60 min → 10-15 min per mob)
 **Quality**: Production-ready with proper conversion workflow
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used citadel-to-geckolib-conversion
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used citadel-to-geckolib-conversion`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

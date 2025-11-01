@@ -674,3 +674,17 @@ Use this skill when:
 8. **Reproducibility** - Results must be consistent across runs
 9. **No Regressions** - Verify nothing breaks
 10. **Share Results** - Help the community with transparent reporting
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used performance-testing
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used performance-testing`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

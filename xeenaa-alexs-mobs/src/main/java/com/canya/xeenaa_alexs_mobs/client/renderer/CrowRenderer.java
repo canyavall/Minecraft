@@ -170,77 +170,67 @@ public class CrowRenderer extends GeoEntityRenderer<CrowEntity> {
         // COMPREHENSIVE LOGGING - Log every 10 ticks (0.5 seconds) for better tracking
         if (entity.age % 10 == 0) {
             System.out.println("\n╔════════════════════════════════════════════════════════════╗");
-            System.out.println("║           CROW RENDER DEBUG - Frame " + entity.age + "              ║");
+            System.out.println("║      CROW POSITIONING DEBUG - Frame " + entity.age + "           ║");
             System.out.println("╚════════════════════════════════════════════════════════════╝");
 
-            // === ENTITY POSITION ===
-            System.out.println("\n[POSITION]");
-            System.out.println("  World: X=" + String.format("%.3f", entity.getX()) +
-                             " Y=" + String.format("%.3f", entity.getY()) +
-                             " Z=" + String.format("%.3f", entity.getZ()));
+            // === POSITION ===
+            System.out.println("\n[WORLD POSITION]");
+            System.out.println("  X: " + String.format("%.3f", entity.getX()));
+            System.out.println("  Y: " + String.format("%.3f", entity.getY()));
+            System.out.println("  Z: " + String.format("%.3f", entity.getZ()));
             System.out.println("  OnGround: " + entity.isOnGround());
 
-            // === ENTITY ROTATION ===
-            System.out.println("\n[ROTATION - Entity Values]");
-            System.out.println("  Pitch: " + String.format("%.2f", entity.getPitch()) + "° (up/down tilt)");
-            System.out.println("  Yaw: " + String.format("%.2f", entity.getYaw()) + "° (facing direction)");
-            System.out.println("  Render Yaw: " + String.format("%.2f", entityYaw) + "° (interpolated)");
-            System.out.println("  Body Yaw: " + String.format("%.2f", entity.bodyYaw) + "°");
-            System.out.println("  Head Yaw: " + String.format("%.2f", entity.headYaw) + "°");
-            System.out.println("  Prev Yaw: " + String.format("%.2f", entity.prevYaw) + "°");
+            // === MODEL BONE STRUCTURE (from crow.geo.json) ===
+            System.out.println("\n[MODEL BONE ROTATIONS - Baked in geo.json]");
+            System.out.println("  Body:   57.5° X-rotation (tilted forward)");
+            System.out.println("  Legs:   32.5° X-rotation (angled back)");
+            System.out.println("  Tail:   -7.5° X-rotation (slightly down)");
+            System.out.println("  Wings:  2.5° X-rotation (nearly flat)");
+            System.out.println("  → Problem: Body tilt causes 'laying on belly' appearance");
 
-            // === VELOCITY ===
+            // === CURRENT RENDERER TRANSFORMATIONS ===
+            System.out.println("\n[CURRENT RENDERER TRANSFORMS]");
+            System.out.println("  1. Scale: 0.8x (reduces size)");
+            System.out.println("  2. Y-Rotation: 180° (fixes backwards flight)");
+            System.out.println("  3. X-Rotation: TESTING... (trying to fix vertical orientation)");
+
+            // === ROTATION TESTING ===
+            System.out.println("\n[ROTATION FIX PROGRESS]");
+            System.out.println("  ✅ Y-Rotation: 180° - Fixes backwards flight (WORKING)");
+            System.out.println("  ✅ X-Rotation: -57.5° - Fixes laying on belly (WORKING)");
+            System.out.println("  🔧 Z-Rotation: TESTING - Fix left tilt/diagonal flight");
+
+            // === DIAGONAL FLIGHT ISSUE ===
+            System.out.println("\n[CURRENT ISSUE: LEFT TILT]");
+            System.out.println("  Problem: Crow tilted to left, flies diagonally");
+            System.out.println("  Cause: Model may have roll offset or combined rotations");
+            System.out.println("  Testing: Z-axis rotation to level out the crow");
+
+            // === HEAD & TAIL POSITIONING ===
+            System.out.println("\n[BODY ALIGNMENT]");
+            System.out.println("  Goal: Level crow horizontally");
+            System.out.println("  Expected: No left/right tilt when flying");
+            System.out.println("  Testing angles: 0°, ±15°, ±30°, ±45°");
+
+            // === VELOCITY (for context) ===
             System.out.println("\n[VELOCITY]");
-            System.out.println("  X: " + String.format("%.4f", entity.getVelocity().x));
-            System.out.println("  Y: " + String.format("%.4f", entity.getVelocity().y) +
-                             (entity.getVelocity().y > 0 ? " (rising)" : entity.getVelocity().y < 0 ? " (falling)" : " (level)"));
-            System.out.println("  Z: " + String.format("%.4f", entity.getVelocity().z));
-            System.out.println("  Speed: " + String.format("%.4f", Math.sqrt(
-                entity.getVelocity().x * entity.getVelocity().x +
-                entity.getVelocity().y * entity.getVelocity().y +
-                entity.getVelocity().z * entity.getVelocity().z)));
+            System.out.println("  Y: " + String.format("%.3f", entity.getVelocity().y) +
+                             (entity.getVelocity().y > 0 ? " ↑" : entity.getVelocity().y < 0 ? " ↓" : " →"));
+            System.out.println("  Speed: " + String.format("%.3f", entity.getVelocity().length()));
 
-            // === ANIMATION STATE ===
-            System.out.println("\n[ANIMATION STATE]");
-            System.out.println("  Age: " + entity.age + " ticks");
-            System.out.println("  Flying: " + !entity.isOnGround());
-            System.out.println("  Moving: " + (entity.getVelocity().lengthSquared() > 0.001));
-
-            // === CALCULATED ANGLES ===
-            System.out.println("\n[CALCULATED ANGLES]");
-            double horizontalSpeed = Math.sqrt(
-                entity.getVelocity().x * entity.getVelocity().x +
-                entity.getVelocity().z * entity.getVelocity().z);
-            double totalSpeed = entity.getVelocity().length();
-            double calculatedPitch = totalSpeed > 0.001 ?
-                Math.toDegrees(Math.atan2(entity.getVelocity().y, horizontalSpeed)) : 0;
-            System.out.println("  Calculated Pitch (from velocity): " + String.format("%.2f", calculatedPitch) + "°");
-            System.out.println("  Yaw Change (from prev): " + String.format("%.2f", entity.getYaw() - entity.prevYaw) + "°");
-
-            // === RENDERER TRANSFORMATIONS ===
-            System.out.println("\n[RENDERER TRANSFORMATIONS]");
-            System.out.println("  1. Scale: 0.8x (all axes)");
-            System.out.println("  2. Rotations: NONE (testing natural)");
-            System.out.println("  Note: Model has baked 57.5° X-rotation in geo.json");
-
-            // === VISUAL EXPECTATIONS ===
-            System.out.println("\n[EXPECTED VISUAL]");
-            if (!entity.isOnGround()) {
-                System.out.println("  Should be: Flying horizontally (laying flat)");
-                System.out.println("  Turning: Entity yaw should rotate model around vertical axis");
-            } else {
-                System.out.println("  Should be: On ground (maybe walking)");
-            }
-
-            System.out.println("\n" + "═".repeat(60) + "\n");
+            System.out.println("\n" + "═".repeat(60));
+            System.out.println("ROTATION ORDER: Y (180°) → X (-57.5°) → Z (testing)");
+            System.out.println("If still tilted, try different Z angles in increments of 15°");
+            System.out.println("═".repeat(60) + "\n");
         }
 
         // Scale the model to appropriate size (crows are medium-sized birds)
         poseStack.scale(0.8f, 0.8f, 0.8f);
 
-        // Y-axis 180° fixes backwards flying (CONFIRMED WORKING)
-        // Issue: Legs on top, head on bottom (needs additional rotation)
-        poseStack.multiply(new Quaternionf().rotateY((float) Math.PI));
+        // REVERT: Remove all custom rotations
+        // Problem: Crow rotating around feet pivot (like clock) instead of body center
+        // Solution: Let GeckoLib handle rotations naturally with its bone system
+        // The model's bones should handle orientation, not renderer transforms
 
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.pop();

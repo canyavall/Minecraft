@@ -283,3 +283,17 @@ This skill **does not replace**:
 **Length limits**: 30 lines initial, 50-100 extended, unlimited in files
 
 Remember: Most users just need the answer and next steps. Give them that first.
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used concise-responses
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used concise-responses`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

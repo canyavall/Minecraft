@@ -350,3 +350,17 @@ Use this skill when:
 - Reviewing or updating epic requirements
 - Questions about "How should I structure requirements?"
 - Ensuring requirements are business-focused, not technical
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used epic-requirements
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used epic-requirements`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

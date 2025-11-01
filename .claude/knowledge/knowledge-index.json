@@ -1,38 +1,118 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "description": "Centralized knowledge base index for cross-project Minecraft modding research",
+  "metadata": {
+    "last_updated": "2025-11-01",
+    "total_entries": 5,
+    "schema_version": "2.0"
+  },
+  "taxonomy": {
+    "categories": [
+      {
+        "id": "minecraft",
+        "name": "Minecraft Systems",
+        "description": "Core Minecraft game systems and mechanics"
+      },
+      {
+        "id": "fabric",
+        "name": "Fabric API",
+        "description": "Fabric mod loader and API patterns"
+      },
+      {
+        "id": "library",
+        "name": "Third-Party Libraries",
+        "description": "External libraries and integrations"
+      },
+      {
+        "id": "graphics",
+        "name": "Graphics & Rendering",
+        "description": "Visual systems, rendering, animations"
+      },
+      {
+        "id": "performance",
+        "name": "Performance & Optimization",
+        "description": "Profiling, benchmarking, optimization strategies"
+      }
+    ],
+    "tag_groups": {
+      "entities": ["entities", "mobs", "ai", "pathfinding", "brain-system"],
+      "graphics": ["rendering", "textures", "animations", "models", "3d-transforms", "bones"],
+      "performance": ["profiling", "benchmarking", "optimization", "monitoring", "threading"],
+      "fabric": ["fabric", "registry", "networking", "events", "mixins"],
+      "libraries": ["geckolib", "citadel", "cloth-config", "mod-menu"],
+      "systems": ["villagers", "professions", "poi", "beds", "trading"]
+    }
+  },
   "entries": [
     {
       "path": "minecraft/villagers.md",
       "title": "Minecraft Villager System",
+      "category": "minecraft",
       "tags": ["minecraft", "villagers", "professions", "textures", "ai", "pathfinding", "brain-system", "beds", "poi"],
       "date_updated": "2025-10-27",
       "summary": "Complete documentation of villager profession textures, brain AI system, bed claiming mechanics, and Point of Interest system for Minecraft 1.21.1",
-      "related": ["fabric-api/registry.md", "minecraft/entities.md"]
+      "related": ["fabric-api/registry.md", "minecraft/entities.md"],
+      "relevance": {
+        "projects": ["xeena-village-manager"],
+        "topics": ["entities", "ai-systems", "vanilla-mechanics"],
+        "difficulty": "intermediate"
+      }
     },
     {
       "path": "performance/profiling.md",
       "title": "Performance Profiling and Analysis Tools",
+      "category": "performance",
       "tags": ["performance", "profiling", "spark", "jvm", "benchmarking", "tools", "optimization", "monitoring"],
       "date_updated": "2025-10-27",
       "summary": "Comprehensive comparison of performance analysis tools for Minecraft development including Spark, JProfiler, JMH, and Fabric-specific optimization mods",
-      "related": ["performance/threading.md", "performance/benchmarking.md"]
+      "related": ["performance/threading.md", "performance/benchmarking.md"],
+      "relevance": {
+        "projects": ["xeenaa-fabric-enhancements", "xeenaa-structure-manager"],
+        "topics": ["performance-optimization", "debugging", "measurement"],
+        "difficulty": "intermediate"
+      }
     },
     {
       "path": "libraries/porting-forge-to-fabric.md",
       "title": "Porting Mods from Forge/NeoForge to Fabric",
+      "category": "library",
       "tags": ["fabric", "forge", "neoforge", "porting", "geckolib", "entities", "animation", "registry", "migration"],
       "date_updated": "2025-10-27",
       "summary": "Complete guide for porting mods from Forge/NeoForge to Fabric, covering entity systems, registration patterns, animation library migration (Citadel to GeckoLib), and common pitfalls",
-      "related": ["fabric-api/registry.md", "fabric-api/networking.md", "minecraft/entities.md", "graphics/animations.md"]
+      "related": ["fabric-api/registry.md", "fabric-api/networking.md", "minecraft/entities.md", "graphics/animations.md"],
+      "relevance": {
+        "projects": ["xeenaa-alexs-mobs"],
+        "topics": ["mod-porting", "entities", "animations", "migration"],
+        "difficulty": "advanced"
+      }
     },
     {
       "path": "minecraft/alexs-mobs-reference.md",
       "title": "Alex's Mobs - Complete Mob Reference Catalog",
+      "category": "minecraft",
       "tags": ["minecraft", "entities", "mobs", "alex's-mobs", "porting", "reference", "assets", "creatures"],
       "date_updated": "2025-10-27",
       "summary": "Complete reference catalog of 92 creatures from Alex's Mobs v1.22.9 with textures, sounds, animations, asset requirements, complexity tiers, and porting effort estimates for entity-heavy mod projects",
-      "related": ["libraries/porting-forge-to-fabric.md", "performance/profiling.md"]
+      "related": ["libraries/porting-forge-to-fabric.md", "performance/profiling.md"],
+      "relevance": {
+        "projects": ["xeenaa-alexs-mobs"],
+        "topics": ["entities", "mod-porting", "assets", "reference-data"],
+        "difficulty": "reference"
+      }
+    },
+    {
+      "path": "graphics/flying-entity-control.md",
+      "title": "Flying Entity Control in Minecraft with GeckoLib",
+      "category": "graphics",
+      "tags": ["flying-entities", "geckolib", "entity-rendering", "rotation", "animation", "3d-transforms", "coordinate-system", "pitch", "yaw", "bones"],
+      "date_updated": "2025-11-01",
+      "summary": "Comprehensive guide for implementing flying entities with proper 3D rotation, translation, and GeckoLib bone animation. Covers coordinate systems, rotation pivot problems, PoseStack transformations, and solutions to common issues like clock pivoting and backwards flight",
+      "related": ["minecraft/entities.md", "graphics/animations.md", "libraries/porting-forge-to-fabric.md", "minecraft/alexs-mobs-reference.md"],
+      "relevance": {
+        "projects": ["xeenaa-alexs-mobs"],
+        "topics": ["flying-entities", "rendering", "animations", "3d-math"],
+        "difficulty": "advanced"
+      }
     }
   ]
 }

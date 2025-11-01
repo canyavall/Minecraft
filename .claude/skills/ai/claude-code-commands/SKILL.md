@@ -1,6 +1,6 @@
 ---
 name: claude-code-commands
-description: Comprehensive guide for creating, configuring, and maintaining Claude Code slash commands with clear workflows, agent invocation, and validation patterns.
+description: Creating and maintaining Claude Code slash commands - user-invoked workflows with agent orchestration, validation checkpoints, and argument parsing. Use when creating commands, debugging command execution, or fixing agent invocation issues.
 category: ai
 tags: [ai, claude-code, commands, workflows, slash-commands]
 allowed-tools: [Read, Write, Edit, Glob, Grep]
@@ -8,7 +8,7 @@ allowed-tools: [Read, Write, Edit, Glob, Grep]
 
 # Claude Code Commands
 
-Comprehensive guide for creating and maintaining Claude Code slash commands with proper agent invocation, workflow patterns, and user validation.
+Comprehensive guide for creating and maintaining Claude Code slash commands - **user-invoked** workflows that orchestrate agents and manage task execution.
 
 ## Purpose
 
@@ -31,9 +31,21 @@ This skill provides patterns and best practices for:
 
 ## Command Architecture Principles
 
-### 1. Commands Invoke Agents
+### 1. User-Invoked vs Model-Invoked
 
-**Commands are entry points that invoke specialized agents**:
+**Critical Distinction**:
+- **Commands** = User-invoked (user explicitly types `/command`)
+- **Skills** = Model-invoked (Claude autonomously activates based on relevance)
+
+**When user types `/command`**:
+1. Claude Code finds `.claude/commands/command.md`
+2. Command file expands into conversation prompt
+3. Claude assumes the agent role specified in command
+4. Agent executes with specified workflow
+
+### 2. Commands Orchestrate Agents
+
+**Commands are entry points that orchestrate specialized agents**:
 
 ```markdown
 ---
@@ -45,11 +57,11 @@ You are the [agent-name] responsible for [specific task].
 [Rest of command workflow]
 ```
 
-**Why**: Commands don't have persistent identity. They expand to a prompt that tells Claude which agent to be.
+**Why**: Commands don't have persistent identity. They expand to a prompt that tells Claude which agent role to assume.
 
 **Key Point**: Command file must be comprehensive - it doesn't automatically merge with agent file.
 
-### 2. Clear Agent Identity
+### 3. Clear Agent Identity
 
 **Always start command with agent identity**:
 
@@ -64,7 +76,7 @@ Create an epic with business requirements.
 
 **Why**: Claude needs to know which agent role to assume and which boundaries to respect.
 
-### 3. Validation Checkpoints
+### 4. Validation Checkpoints
 
 **Commands must include user validation at key points**:
 
@@ -948,3 +960,17 @@ Parse intelligently:
 - Documentation: `.claude/CLAUDE.md` (Commands section)
 - Examples: See existing commands in `.claude/commands/`
 - Claude Code docs: https://docs.claude.com/en/docs/claude-code
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used claude-code-commands
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used claude-code-commands`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

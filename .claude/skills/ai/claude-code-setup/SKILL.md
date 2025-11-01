@@ -387,3 +387,17 @@ After making changes:
 - Examples: `examples/agent-templates.md`, `examples/command-templates.md`
 - Documentation: `.claude/CLAUDE.md` (complete skills and agent documentation)
 - Claude Code docs: https://docs.claude.com/en/docs/claude-code
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used claude-code-setup
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used claude-code-setup`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

@@ -1052,3 +1052,17 @@ Use this skill when:
 8. **Test Rigorously**: Benchmark before/after with real workloads
 9. **Document Impact**: Record performance metrics for all optimizations
 10. **Memory Matters**: Reduce allocations to minimize GC pressure
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used minecraft-performance-general
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used minecraft-performance-general`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

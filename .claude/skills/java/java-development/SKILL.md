@@ -387,3 +387,17 @@ Use this skill when:
 - Questions about "What's the modern Java way to do X?"
 - Implementing design patterns in Java
 - Optimizing Java code performance
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used java-development
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used java-development`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

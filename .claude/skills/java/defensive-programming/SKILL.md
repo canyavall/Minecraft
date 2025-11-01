@@ -484,3 +484,17 @@ Use this skill when:
 5. **Tests Are Documentation**: Good tests show how code should work
 6. **Fast Tests Run Often**: Slow tests don't get run, fast tests protect continuously
 7. **Defensive Coding**: Validate inputs, handle errors, check assumptions
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used defensive-programming
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used defensive-programming`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

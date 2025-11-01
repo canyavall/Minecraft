@@ -1,4 +1,5 @@
 ---
+name: geckolib-animation-patterns
 tags: [minecraft, geckolib, animation, mob, entity]
 activationPhrase: "geckolib animation patterns"
 skillPriority: medium
@@ -8,6 +9,7 @@ activationConditions:
   - filePattern: "**/client/model/*.java"
   - contentMatch: "AnimatableModel|AnimationController|AnimationState"
 ---
+
 
 # GeckoLib Animation Patterns Skill
 
@@ -802,3 +804,17 @@ state.getController().setAnimation(RawAnimation.begin().then("idle", ...));
 ---
 
 **Next Skill**: See `mob-conversion-automation` for code generator designs and automation tools.
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used geckolib-animation-patterns
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used geckolib-animation-patterns`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

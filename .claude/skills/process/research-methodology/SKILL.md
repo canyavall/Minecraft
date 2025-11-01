@@ -369,3 +369,17 @@ Use this skill when:
 - Creating technical documentation
 - The command `/research` is invoked
 - implementation-agent needs information before coding
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used research-methodology
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used research-methodology`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

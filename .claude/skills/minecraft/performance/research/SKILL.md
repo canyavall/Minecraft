@@ -332,3 +332,17 @@ Use this skill:
 ---
 
 **Remember**: Research solves today's problem. Skills prevent tomorrow's re-research.
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used minecraft-performance-research
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used minecraft-performance-research`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

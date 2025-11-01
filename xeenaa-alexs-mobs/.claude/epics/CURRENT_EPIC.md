@@ -87,7 +87,7 @@
 **Plan**: `xeenaa-alexs-mobs/.claude/epics/007-crow-flying-passive-bird/plan.md`
 
 **Last Completed**: TASK-001.4 - Fix Dynamic Pitch ✅
-**Next Task**: TASK-003 - Validate Basic Crow Functionality (manual testing required)
+**Current Task**: TASK-003 - Validate Basic Crow Functionality (IN PROGRESS - awaiting user manual testing)
 
 ---
 

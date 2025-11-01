@@ -436,7 +436,7 @@ Add Crow spawn egg to creative inventory so users can summon crows without comma
 
 ### TASK-003: Validate Basic Crow Functionality
 
-**Status**: TODO
+**Status**: IN PROGRESS
 **Priority**: HIGH
 **Assigned**: User (manual validation)
 **Estimated**: 30 minutes

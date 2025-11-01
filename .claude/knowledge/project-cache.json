@@ -1,0 +1,127 @@
+{
+  "version": "1.0",
+  "description": "Pre-computed mappings of projects to relevant knowledge entries for fast context loading",
+  "last_updated": "2025-11-01",
+  "cache": {
+    "xeena-village-manager": {
+      "description": "Villager management mod with GUI and guard system",
+      "relevant_knowledge": [
+        {
+          "path": "minecraft/villagers.md",
+          "priority": "high",
+          "reason": "Core villager mechanics essential for mod features"
+        },
+        {
+          "path": "fabric-api/registry.md",
+          "priority": "medium",
+          "reason": "Entity and item registration patterns"
+        },
+        {
+          "path": "minecraft/entities.md",
+          "priority": "medium",
+          "reason": "Entity AI and behavior systems for guards"
+        }
+      ],
+      "common_tags": ["villagers", "entities", "gui", "fabric", "registry", "ai"]
+    },
+    "xeenaa-fabric-enhancements": {
+      "description": "Performance optimizations for Fabric",
+      "relevant_knowledge": [
+        {
+          "path": "performance/profiling.md",
+          "priority": "high",
+          "reason": "Essential for measuring performance improvements"
+        },
+        {
+          "path": "performance/threading.md",
+          "priority": "high",
+          "reason": "Threading optimization patterns"
+        },
+        {
+          "path": "performance/benchmarking.md",
+          "priority": "high",
+          "reason": "Before/after measurement methodology"
+        }
+      ],
+      "common_tags": ["performance", "profiling", "optimization", "benchmarking", "fabric"]
+    },
+    "xeenaa-structure-manager": {
+      "description": "Structure generation performance optimization",
+      "relevant_knowledge": [
+        {
+          "path": "performance/profiling.md",
+          "priority": "high",
+          "reason": "Profiling structure generation bottlenecks"
+        },
+        {
+          "path": "minecraft/world-generation.md",
+          "priority": "high",
+          "reason": "Structure generation mechanics"
+        }
+      ],
+      "common_tags": ["performance", "world-generation", "structures", "optimization"]
+    },
+    "xeenaa-alexs-mobs": {
+      "description": "Port of Alex's Mobs from Forge to Fabric",
+      "relevant_knowledge": [
+        {
+          "path": "libraries/porting-forge-to-fabric.md",
+          "priority": "critical",
+          "reason": "Core porting guide for Forge→Fabric migration"
+        },
+        {
+          "path": "minecraft/alexs-mobs-reference.md",
+          "priority": "critical",
+          "reason": "Complete mob catalog and asset inventory"
+        },
+        {
+          "path": "graphics/flying-entity-control.md",
+          "priority": "high",
+          "reason": "Flying entity implementation (crows, eagles, etc.)"
+        },
+        {
+          "path": "minecraft/entities.md",
+          "priority": "high",
+          "reason": "Entity registration and AI patterns"
+        },
+        {
+          "path": "graphics/animations.md",
+          "priority": "high",
+          "reason": "GeckoLib animation system"
+        },
+        {
+          "path": "fabric-api/registry.md",
+          "priority": "medium",
+          "reason": "Fabric-specific registration patterns"
+        }
+      ],
+      "common_tags": ["porting", "entities", "geckolib", "animations", "forge", "fabric", "alexs-mobs"]
+    },
+    "xeenaa-soulbound": {
+      "description": "Soulbound items mod (planned)",
+      "relevant_knowledge": [
+        {
+          "path": "minecraft/items.md",
+          "priority": "high",
+          "reason": "Item system and NBT data"
+        },
+        {
+          "path": "fabric-api/events.md",
+          "priority": "high",
+          "reason": "Player death and respawn events"
+        }
+      ],
+      "common_tags": ["items", "events", "fabric", "nbt"]
+    }
+  },
+  "cache_metadata": {
+    "update_strategy": "manual",
+    "invalidation_trigger": "knowledge_index_update",
+    "priority_levels": {
+      "critical": "Must read for any work on this project",
+      "high": "Highly relevant, read for most tasks",
+      "medium": "Useful reference, read when applicable",
+      "low": "Background information, optional"
+    }
+  }
+}

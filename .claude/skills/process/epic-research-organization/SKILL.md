@@ -456,3 +456,17 @@ research/task-002/profiling.md
 **Last Updated**: 2025-10-25
 **Pattern Version**: 1.0
 **Applies To**: All projects using epic-based workflow
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used epic-research-organization
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used epic-research-organization`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

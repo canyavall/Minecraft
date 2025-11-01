@@ -466,3 +466,17 @@ Use this skill when:
 - Reviewing task structure and quality
 - Questions about "How should I structure tasks?"
 - Ensuring tasks are technical and actionable
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used task-planning
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used task-planning`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

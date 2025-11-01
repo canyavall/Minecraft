@@ -1,6 +1,6 @@
 ---
 name: claude-code-agents
-description: Comprehensive guide for creating, configuring, and maintaining Claude Code agents with clear responsibility boundaries and skill integration.
+description: Creating and maintaining Claude Code agents - standalone parallel workers with clear responsibility boundaries, skill activation patterns, and command orchestration. Use when creating agents, debugging agent boundaries, or fixing skill integration issues.
 category: ai
 tags: [ai, claude-code, agents, workflow, configuration]
 allowed-tools: [Read, Write, Edit, Glob, Grep]
@@ -8,7 +8,7 @@ allowed-tools: [Read, Write, Edit, Glob, Grep]
 
 # Claude Code Agents
 
-Comprehensive guide for creating and maintaining Claude Code agents with proper boundaries, skill integration, and workflow patterns.
+Comprehensive guide for creating and maintaining Claude Code agents - **standalone parallel workers** that execute specialized tasks with clear boundaries and skill integration.
 
 ## Purpose
 
@@ -51,15 +51,15 @@ This skill provides patterns and best practices for:
 
 **Why**: Prevents agent confusion, ensures predictable behavior, makes debugging easier.
 
-### 2. Skills-Based Knowledge
+### 2. Skills Activate Automatically
 
-**Agents reference skills, never "load" them**:
+**Agents reference skills - Claude autonomously activates them based on relevance**:
 
 ```markdown
 # ✅ CORRECT
 ## Skills You Use
 
-Follow patterns from these skills (Claude Code loads automatically):
+Follow patterns from these skills (model-invoked when relevant):
 - `coding-standards` - Naming conventions, code organization
 - `minecraft-modding` - Minecraft systems and best practices
 - `fabric-modding` - Fabric API specific patterns
@@ -70,7 +70,13 @@ Follow patterns from these skills (Claude Code loads automatically):
 Load the `coding-standards` skill and apply its patterns.
 ```
 
-**Why**: Skills auto-load based on frontmatter. "Load" language creates confusion and extra work.
+**Why**: Skills are **model-invoked** - Claude decides when to activate them based on task relevance. "Load" language is incorrect and creates confusion.
+
+**How it works**:
+1. Claude reads skill descriptions at startup
+2. During task execution, Claude matches task requirements to skill descriptions
+3. Claude autonomously activates relevant skills
+4. Progressive disclosure loads skill content on-demand
 
 ### 3. Clear Handoff Protocols
 
@@ -514,3 +520,17 @@ When creating a new agent:
 - Related skills: `claude-code-skills`, `claude-code-commands`, `claude-code-setup`
 - Documentation: `.claude/CLAUDE.md` (Agent-Driven Development section)
 - Examples: See existing agents in `.claude/agents/`
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used claude-code-agents
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used claude-code-agents`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

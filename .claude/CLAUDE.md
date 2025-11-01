@@ -242,7 +242,8 @@ All commands automatically target the active project.
 
 **1. Centralized Knowledge Base** (`.claude/knowledge/`)
 - Universal research shared across ALL projects
-- Tag-based discovery via `knowledge-index.json`
+- Enhanced tag-based discovery via `knowledge-index.json` v2.0
+- Project knowledge cache for automatic context loading
 - Categories: minecraft/, fabric-api/, libraries/, graphics/, performance/
 - Examples: Fabric networking, GeckoLib setup, entity rendering, profiling
 
@@ -251,19 +252,50 @@ All commands automatically target the active project.
 - Implementation notes specific to THIS mod
 - References centralized knowledge when applicable
 
+### Enhanced Knowledge Infrastructure
+
+**NEW v2.0 Features**:
+
+1. **Enhanced Index Structure** (`knowledge-index.json`)
+   - Taxonomy section with formal categories and tag groups
+   - Entry categorization (minecraft, fabric, library, graphics, performance)
+   - Relevance metadata: projects, topics, difficulty levels
+   - Better searchability and discoverability
+
+2. **Project Knowledge Cache** (`project-cache.json`)
+   - Pre-computed mappings: project → relevant knowledge
+   - Priority levels: critical, high, medium, low
+   - Automatic context loading during `/next` command
+   - Eliminates redundant knowledge searches
+
+3. **Context-Aware Task Preloading**
+   - planning-agent automatically loads project-relevant knowledge
+   - Task-specific knowledge matching by tags and keywords
+   - Knowledge context passed to worker agents
+   - Ensures agents have right information before starting
+
 ### Using the Knowledge Base
 
 **Agents (especially research-agent):**
-1. ALWAYS search `knowledge-index.json` FIRST by tags
-2. Read existing knowledge to avoid duplicate research
-3. Add universal findings to knowledge base
-4. Update index with tags for discoverability
-5. **Follow WRITING_STANDARDS.md** when creating/updating knowledge
+1. ALWAYS search `knowledge-index.json` FIRST by tags (now with enhanced taxonomy)
+2. Check `project-cache.json` for project-relevant knowledge
+3. Read existing knowledge to avoid duplicate research
+4. Add universal findings to knowledge base
+5. Update index AND project cache with new knowledge
+6. **Follow WRITING_STANDARDS.md** when creating/updating knowledge
+
+**planning-agent (automatic context loading):**
+1. Read `project-cache.json` during `/next` command
+2. Load all "critical" and "high" priority knowledge for active project
+3. Match task keywords to knowledge tags for task-specific additions
+4. Pass knowledge context to implementation-agent or research-agent
 
 **Documentation**:
 - `.claude/knowledge/WRITING_STANDARDS.md` - How to write knowledge files
 - `.claude/knowledge/MIGRATION_GUIDE.md` - How to migrate research
 - `.claude/knowledge/README.md` - Knowledge base overview
+- `.claude/knowledge/knowledge-index.json` - Enhanced searchable index
+- `.claude/knowledge/project-cache.json` - Project→knowledge mappings
 
 ## Skills (Shared Workflow Patterns)
 
@@ -274,6 +306,8 @@ Skills provide specialized workflow patterns that activate automatically based o
 ### Minecraft Skills
 - **minecraft-modding** - Core Minecraft systems (loader-agnostic)
 - **fabric-modding** - Fabric API specific patterns
+- **flying-entity-control** - Flying entity rotation, animation, and aerial movement with GeckoLib
+- **geckolib-animation-patterns** - GeckoLib animation keyframes and state management
 - **minecraft-performance-general** - General optimization strategies
 - **minecraft-performance-structure** - Structure generation optimization
 - **minecraft-performance-research** - Knowledge retention from research
@@ -296,10 +330,12 @@ Skills provide specialized workflow patterns that activate automatically based o
 - **multi-project-workflow** - Multi-project patterns and troubleshooting
 
 ### AI Skills
+- **ai-workflow** - How AI flows work: agents, commands, skills, and user interaction patterns
 - **claude-code-setup** - AI infrastructure and configuration
 - **claude-code-agents** - Agent creation and boundaries
 - **claude-code-skills** - Skills creation and organization
 - **claude-code-commands** - Command workflows and patterns
+- **claude-code-hooks** - Hooks configuration, automation, validation, and debugging
 
 **Skill files**: `.claude/skills/<category>/<skill-name>/SKILL.md`
 
@@ -377,6 +413,8 @@ See **multi-project-workflow** skill for detailed patterns and troubleshooting.
 **Task numbering**:
 - Main tasks: `TASK-001`, `TASK-002`, `TASK-015`
 - Sub-tasks: `TASK-001.1`, `TASK-001.2`
+
+---
 
 ## Code Quality Standards
 

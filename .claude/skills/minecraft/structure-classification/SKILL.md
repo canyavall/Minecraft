@@ -749,3 +749,17 @@ LOGGER.info("Type detection accuracy: {}%", accuracy);
 ---
 
 **Key Takeaway**: Single-dimension classification (size-only OR type-only) breaks edge cases. Two independent dimensions (SIZE + TYPE) with a priority system (Type > Size > Global) handles all structure varieties correctly.
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used structure-classification
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used structure-classification`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

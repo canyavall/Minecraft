@@ -1,4 +1,5 @@
 ---
+name: mob-conversion-automation
 tags: [minecraft, automation, citadel, geckolib, code-generation, tools]
 activationPhrase: "mob conversion automation"
 skillPriority: high
@@ -928,3 +929,17 @@ Total: ~23 hours for 90 mobs (vs 82 hours manual)
 - ✅ Conversion time reduced from 55 min to 15 min per mob
 - ✅ Visual quality matches original Alex's Mobs
 - ✅ All animations work correctly after generation
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used mob-conversion-automation
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used mob-conversion-automation`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

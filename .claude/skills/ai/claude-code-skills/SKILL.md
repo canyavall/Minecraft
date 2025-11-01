@@ -1,708 +1,411 @@
 ---
 name: claude-code-skills
-description: Comprehensive guide for creating, organizing, and maintaining Claude Code skills with proper structure, categorization, and integration patterns.
+description: Creating and maintaining Claude Code skills - model-invoked capabilities with trigger-based activation, progressive disclosure, and proper frontmatter configuration. Use when creating skills, debugging activation issues, or structuring skill content.
 category: ai
-tags: [ai, claude-code, skills, knowledge, configuration]
+tags: [ai, claude-code, skills, knowledge, organization]
 allowed-tools: [Read, Write, Edit, Glob, Grep]
 ---
 
 # Claude Code Skills
 
-Comprehensive guide for creating and maintaining Claude Code skills as reusable knowledge packages with proper structure and auto-loading behavior.
+Guide for creating and maintaining Claude Code skills as model-invoked capabilities that extend Claude's functionality.
 
-## Purpose
+## Core Principles
 
-This skill provides patterns and best practices for:
-- Creating new skills with proper frontmatter
-- Organizing skills by category
-- Keeping skills concise and maintainable
-- Integrating skills with agents and commands
-- Debugging skill loading issues
-- Managing skill dependencies
+### 1. Model-Invoked Activation
 
-## When to Use
+**Skills are "model-invoked"** - Claude autonomously decides when to activate them based on relevance to the current task.
 
-- Creating a new skill for reusable knowledge
-- Refactoring large agent prompts into skills
-- Fixing skill loading or integration issues
-- Organizing knowledge across multiple skills
-- Understanding skill auto-loading behavior
-
-## Skills Architecture Principles
-
-### 1. Auto-Loading via Frontmatter
-
-**Skills load automatically based on frontmatter metadata**:
+Skills activate based on metadata in frontmatter:
 
 ```yaml
 ---
+name: skill-name                           # Required: lowercase, hyphens, max 64 chars
+description: What it does AND when to use  # Required: includes trigger terms, max 1024 chars
+allowed-tools: [Read, Write, Edit]         # Optional: tool restrictions
+category: minecraft|java|process|ai        # Custom: our categorization (not official)
+tags: [keywords, for, matching]            # Custom: our tagging system (not official)
+---
+```
+
+**Official Fields** (Claude Code standard):
+- `name` - Skill identifier (required)
+- `description` - Capability + trigger terms (required, max 1024 chars)
+- `allowed-tools` - Tool access restrictions (optional)
+
+**Custom Fields** (our project extensions):
+- `category` - Our organizational grouping
+- `tags` - Our keyword matching system
+
+**Key**: Model-invoked activation means Claude decides when to use skills based on the `description` field.
+
+### 2. Progressive Disclosure Pattern
+
+**Three-level loading** (official Claude Code pattern):
+
+**Level 1 - Metadata** (loaded at startup):
+- `name` and `description` from frontmatter
+- Claude uses this to determine skill relevance
+- Minimal token cost (~30-50 tokens per skill)
+
+**Level 2 - Core Content** (loaded when skill activates):
+- Full `SKILL.md` file loads into context
+- Target: Under 400 lines for efficiency
+- Quick reference patterns and essential guidance
+
+**Level 3 - Supporting Files** (loaded on-demand):
+- Claude navigates to referenced files when needed
+- Examples: `examples/`, `reference.md`, `templates/`
+- Use markdown links: `See examples/patterns.md for details`
+
+**Structure**:
+```
+skill-name/
+├── SKILL.md           # Core patterns (Level 2)
+├── examples/          # Detailed examples (Level 3)
+│   └── patterns.md
+└── templates/         # Templates (Level 3)
+```
+
+**Pattern**: Metadata → Core → On-demand details
+
+### 3. Single Responsibility
+
+One skill = one knowledge domain
+
+✅ `coding-standards` - Code style, naming, docs
+❌ `development-guide` - Mixed topics (split these)
+
+---
+
+## Skill Creation Process
+
+### Step 1: Design
+
+**Before creating**:
+1. Define clear scope (one domain)
+2. Choose category folder
+3. Identify which agents will use it
+4. Check for existing similar skills
+
+### Step 2: Create Structure
+
+```bash
+mkdir -p .claude/skills/[category]/[skill-name]
+touch .claude/skills/[category]/[skill-name]/SKILL.md
+```
+
+**Categories**:
+- `minecraft/` - Minecraft/modding patterns
+- `java/` - Java language patterns
+- `process/` - Workflow and process
+- `ai/` - AI infrastructure
+
+### Step 3: Write SKILL.md
+
+**Template**:
+```markdown
+---
 name: skill-name
-description: Clear description of what this skill covers
-category: minecraft|java|process|ai
-tags: [relevant, keywords, for, matching]
-allowed-tools: [Read, Write, Edit, Grep, Glob]
----
-```
-
-**Why**: Claude Code reads frontmatter to determine when to load skills. No manual "loading" needed.
-
-**Key Fields**:
-- `name`: Unique identifier (lowercase-with-hyphens)
-- `description`: One-line summary (used for matching)
-- `category`: Organizing folder (optional but recommended)
-- `tags`: Keywords for relevance matching
-- `allowed-tools`: Tools skill can use (optional, for tool-using skills)
-
-### 2. Concise Core with Optional Details
-
-**Keep SKILL.md under 400 lines**:
-
-```
-.claude/skills/category/skill-name/
-├── SKILL.md              # Core patterns (< 400 lines)
-├── examples/             # Detailed examples (optional)
-│   ├── pattern-1.md
-│   ├── pattern-2.md
-│   └── advanced.md
-└── templates/            # Templates (optional)
-    └── template.md
-```
-
-**Why**: Keeps context size manageable, loads faster, easier to maintain.
-
-**Pattern**:
-```markdown
-# SKILL.md (core)
-
-## Pattern Overview
-[Quick reference with key points]
-
-**See `examples/detailed-pattern.md` for complete examples**
-
-## Common Anti-Patterns
-[What NOT to do]
-```
-
-### 3. Single Responsibility Per Skill
-
-**Each skill covers ONE knowledge domain**:
-
-```markdown
-# ✅ CORRECT: coding-standards
-- Naming conventions
-- Code organization
-- Documentation standards
-(All related to code style)
-
-# ❌ WRONG: development-guide
-- Naming conventions
-- Git workflows
-- Performance testing
-- UI design
-(Too broad, split into multiple skills)
-```
-
-**Why**: Makes skills easier to find, maintain, and update. Prevents duplicate knowledge.
-
-## Skill File Structure
-
-### Complete Template
-
-```markdown
----
-name: skill-name
-description: One-line description of skill's knowledge domain
-category: minecraft|java|process|ai
-tags: [keyword1, keyword2, keyword3]
-allowed-tools: [Read, Write, Edit, Grep, Glob]
+description: What it does AND trigger terms users would mention. Use when [specific contexts].
+allowed-tools: [Read, Write]         # Optional: tool restrictions
+category: [category]                  # Custom field (our project)
+tags: [keyword1, keyword2, keyword3]  # Custom field (our project)
 ---
 
-# Skill Title
+# Skill Name
 
-Brief description of what this skill covers and when to use it.
-
-## Purpose
-
-- What knowledge this provides
-- What problems it solves
-- What patterns it documents
+Brief purpose statement.
 
 ## When to Use
 
-- Use case 1
-- Use case 2
-- Use case 3
+- Use case 1 with trigger terms
+- Use case 2 with trigger terms
 
-## [Core Content Section 1]
+## Core Pattern
 
-### Pattern Name
+[Essential pattern with minimal example]
 
-**Context**: When to use this pattern
+**See `examples/detailed.md` for more examples** (progressive disclosure)
 
-**Implementation**:
-```language
-code example
-```
+## Common Anti-Patterns
 
-**Why**: Explanation of reasoning
-
-**Common Mistakes**:
-- ❌ Mistake 1
-- ❌ Mistake 2
-
-**See `examples/detailed-pattern-name.md` for advanced usage**
-
-## [Core Content Section 2]
-
-[Similar structure]
-
-## Best Practices
-
-**✅ DO**:
-- Guideline 1 with reasoning
-- Guideline 2 with reasoning
-
-**❌ DON'T**:
-- Anti-pattern 1 with reasoning
-- Anti-pattern 2 with reasoning
-
-## Quick Reference
-
-[Condensed cheat-sheet format for common patterns]
-
-## Related Skills
-
-- `related-skill-1` - What it covers
-- `related-skill-2` - What it covers
+- ❌ Don't do X
+- ❌ Avoid Y
 
 ## References
 
-- External documentation
-- Relevant files in codebase
-- Examples directory
+- Related skill: `other-skill`
 ```
 
-## Skill Categories
+**Description Field Best Practices**:
+- ✅ Include **trigger terms** users would mention
+- ✅ Explain BOTH capability AND context
+- ✅ Max 1024 characters
+- ❌ Don't use generic terms like "helps with" or "manages"
+- ✅ Example: "Extract text from PDFs, fill forms, merge documents. Use when working with PDF files or mentioning document extraction."
 
-Organize skills by domain:
+### Step 4: Add to Documentation
 
-### minecraft/
-
-**Minecraft-specific knowledge**:
-- `minecraft-modding/` - Core Minecraft systems (loader-agnostic)
-- `fabric-modding/` - Fabric API specific patterns
-- `minecraft-performance/` - Performance optimization
-- `structure-classification/` - Structure filtering strategies
-- `ui-ux-design/` - GUI design for Minecraft
-
-**When to create here**: Knowledge specific to Minecraft game systems
-
-### java/
-
-**Java language and best practices**:
-- `java-development/` - Java 21 features and patterns
-- `coding-standards/` - Naming, organization, documentation
-- `defensive-programming/` - Testing and regression prevention
-- `logging-strategy/` - Logging best practices
-- `performance-testing/` - Benchmarking and profiling
-
-**When to create here**: General Java knowledge, not Minecraft-specific
-
-### process/
-
-**Workflow and methodology**:
-- `research-methodology/` - How to research unknowns
-- `epic-requirements/` - requirements.md creation
-- `task-planning/` - tasks.md creation
-
-**When to create here**: Process guidance, workflow patterns
-
-### ai/
-
-**Claude Code infrastructure**:
-- `claude-code-setup/` - General AI infrastructure
-- `claude-code-agents/` - Agent creation and maintenance
-- `claude-code-skills/` - Skills creation (this skill)
-- `claude-code-commands/` - Command creation and workflows
-
-**When to create here**: Meta-knowledge about the AI system itself
-
-## Skill Size Management
-
-### When to Split a Skill
-
-**Indicators skill is too large**:
-- SKILL.md exceeds 400 lines
-- Covers multiple distinct domains
-- Has many unrelated sections
-- Takes long time to load/read
-
-**How to split**:
+Update `.claude/CLAUDE.md` skills section:
 
 ```markdown
-# Before (too large)
-.claude/skills/java/development-guide/
-└── SKILL.md (800 lines)
-    - Naming conventions
-    - Code organization
-    - Documentation standards
-    - Testing patterns
-    - Logging strategy
-    - Performance optimization
-
-# After (properly split)
-.claude/skills/java/
-├── coding-standards/
-│   └── SKILL.md (200 lines - naming, organization, docs)
-├── defensive-programming/
-│   └── SKILL.md (250 lines - testing patterns)
-├── logging-strategy/
-│   └── SKILL.md (150 lines - logging)
-└── performance-testing/
-    └── SKILL.md (200 lines - performance)
+### [Category] Skills
+- **skill-name** - One-line description
 ```
 
-### When to Use examples/
+### Step 5: (Optional) Add Examples
 
-**Move content to examples/ when**:
-- Pattern needs extensive code examples
-- Multiple variations of same pattern
-- Advanced/edge case scenarios
-- Historical context or migration guides
+If skill needs detailed examples:
 
-**Keep in SKILL.md**:
-- Core patterns and principles
-- Quick reference
-- Common use cases
-- Essential best practices
-
-**Example structure**:
-
-```markdown
-# SKILL.md
-## Authentication Pattern
-
-**Basic Usage**:
-```java
-@Override
-public boolean authenticate(User user) {
-    return validateCredentials(user);
-}
+```bash
+mkdir .claude/skills/[category]/[skill-name]/examples
 ```
 
-**See `examples/auth-patterns.md` for**:
-- OAuth integration
-- JWT token handling
-- Multi-factor authentication
-- Session management
+Create example files referenced from SKILL.md.
 
-# examples/auth-patterns.md
-[Detailed implementations of all authentication patterns]
+---
+
+## Skill Organization
+
+### By Category
+
+```
+.claude/skills/
+├── minecraft/        # Minecraft-specific
+│   ├── fabric-modding/
+│   ├── minecraft-modding/
+│   └── ui-ux-design/
+├── java/             # Java language
+│   ├── coding-standards/
+│   └── java-development/
+├── process/          # Workflows
+│   ├── epic-requirements/
+│   └── task-planning/
+└── ai/               # AI infrastructure
+    ├── ai-workflow/
+    ├── claude-code-agents/
+    ├── claude-code-commands/
+    ├── claude-code-setup/
+    └── claude-code-skills/
 ```
 
-## Skill Integration Patterns
+### Naming Conventions
 
-### Pattern 1: Agent References Skill
+✅ **Good names**:
+- `fabric-modding` - Clear scope
+- `epic-requirements` - Specific purpose
+- `coding-standards` - Well-defined
 
-**In agent file**:
+❌ **Bad names**:
+- `helpers` - Too vague
+- `utils` - Unclear scope
+- `stuff` - Not descriptive
+
+---
+
+## Integration with Agents
+
+### Referencing Skills
+
+**In agent/command prompts**:
 
 ```markdown
 ## Skills You Use
 
-Follow patterns from these skills (Claude Code loads automatically):
-- `coding-standards` - Naming conventions and code organization
-- `minecraft-modding` - Minecraft system knowledge
-- `fabric-modding` - Fabric API specific patterns
+Follow these skills (model-invoked based on relevance):
+- **coding-standards** - Code style and naming
+- **fabric-modding** - Fabric API patterns
 ```
 
-**NOT**:
+**❌ WRONG**:
 ```markdown
-# ❌ WRONG
-Load the `coding-standards` skill and follow its patterns.
+Load the coding-standards skill and follow it.
 ```
 
-**Why**: Skills auto-load. Agent just needs to reference them.
-
-### Pattern 2: Command References Skill
-
-**In command file**:
-
+**✅ CORRECT**:
 ```markdown
-## Your Task
-
-Create requirements.md following the `epic-requirements` skill patterns.
-
-## Execution Steps
-
-### 1. Structure Requirements
-
-Follow the `epic-requirements` skill template structure.
+Follow the coding-standards skill (Claude activates when relevant).
 ```
 
-**Why**: Command tells agent which skill to follow, skill provides the details.
+### How Skills Activate
 
-### Pattern 3: Skill References Other Skills
+**Model-Invoked Activation Process**:
 
-**In SKILL.md**:
+1. **At startup**: Claude reads all SKILL.md frontmatter (name + description)
+2. **During task**: Claude matches task requirements to skill descriptions
+3. **Autonomous decision**: Claude decides which skills to activate
+4. **Progressive loading**: Loads SKILL.md when relevant, then supporting files on-demand
 
-```markdown
-## Related Skills
+**Key Distinction**:
+- **Skills** = Model-invoked (Claude decides based on relevance)
+- **Commands** = User-invoked (user types `/command` explicitly)
 
-This skill works together with:
-- `coding-standards` - For naming conventions used in logging
-- `defensive-programming` - For testing logged behavior
-- `performance-testing` - For measuring logging overhead
+**Agents don't "load" skills - Claude autonomously activates skills based on task relevance**.
 
-**Integration Example**:
-When implementing a feature, apply:
-1. `coding-standards` for method naming
-2. `logging-strategy` (this skill) for observability
-3. `defensive-programming` for test coverage
-```
-
-**Why**: Makes skill relationships explicit, helps users understand the knowledge graph.
-
-### Pattern 4: Skill Family
-
-**For related but distinct skills**:
-
-```
-.claude/skills/minecraft/minecraft-performance/
-├── general/
-│   └── SKILL.md              # General performance optimization
-├── structure/
-│   └── SKILL.md              # Structure-specific optimization
-└── research/
-    └── SKILL.md              # Knowledge retention from research
-```
-
-**Frontmatter**:
-```yaml
-# general/SKILL.md
----
-name: minecraft-performance-general
-description: General Minecraft performance optimization strategies
-tags: [performance, optimization, general]
 ---
 
-# structure/SKILL.md
----
-name: minecraft-performance-structure
-description: Structure generation performance optimization
-tags: [performance, optimization, structures, worldgen]
----
+## Common Issues
 
-# research/SKILL.md
----
-name: minecraft-performance-research
-description: Knowledge retention system for performance research findings
-tags: [performance, research, knowledge-retention]
----
-```
+### Issue: Skill Not Being Used
 
-**Why**: Related knowledge grouped by folder, distinct skills for specific contexts.
+**Symptom**: Agent doesn't follow patterns
 
-## Debugging Skill Issues
-
-### Issue: Skill Not Loading
-
-**Symptoms**: Agent doesn't follow skill patterns, makes mistakes skill would prevent
-
-**Diagnosis**:
-1. Check frontmatter exists and is valid YAML
-2. Verify `name` field matches expected skill name
-3. Ensure `description` clearly describes skill purpose
-4. Check file is in correct location (`.claude/skills/[category]/[skill-name]/SKILL.md`)
+**Causes**:
+- Frontmatter missing or incorrect
+- Tags don't match context
+- Agent prompt says "load skill" (wrong!)
 
 **Fix**:
-```yaml
-# ❌ WRONG (missing frontmatter)
-# Coding Standards
+1. Verify frontmatter has `name`, `description`, `tags`
+2. Update tags to match use cases
+3. Change prompt to "Follow [skill] (auto-loaded)"
 
-# ✅ CORRECT
+### Issue: Skill Too Long
+
+**Symptom**: SKILL.md over 400 lines
+
+**Fix**: Apply progressive loading
+1. Keep core patterns in SKILL.md
+2. Move detailed examples to `examples/`
+3. Add references: "See `examples/X.md` for details"
+
+### Issue: Duplicate Knowledge
+
+**Symptom**: Similar content in multiple skills
+
+**Fix**: Consolidate or reference
+- Merge into one skill if closely related
+- Or have one skill reference another
+- Avoid copy-paste between skills
+
 ---
-name: coding-standards
-description: Java and Minecraft modding code standards
-category: java
-tags: [code, standards, style, naming]
----
-
-# Coding Standards
-```
-
-### Issue: Skill Referenced but Not Applied
-
-**Symptoms**: Agent mentions skill but doesn't follow it
-
-**Diagnosis**:
-1. Check if agent uses "load" language (wrong)
-2. Verify skill content is clear and actionable
-3. Check if skill is too long (>400 lines)
-
-**Fix**:
-
-```markdown
-# In agent/command
-# ❌ WRONG
-Load the `coding-standards` skill
-
-# ✅ CORRECT
-Follow the `coding-standards` skill patterns
-
-# In skill
-# ❌ WRONG (vague)
-Follow best practices for naming
-
-# ✅ CORRECT (specific)
-**Class Names**: PascalCase (e.g., `VillagerManager`)
-**Methods**: camelCase (e.g., `findNearbyVillagers`)
-**Constants**: UPPER_SNAKE_CASE (e.g., `MAX_DISTANCE`)
-```
-
-### Issue: Duplicate Knowledge Across Skills
-
-**Symptoms**: Same information in multiple skills, inconsistencies
-
-**Diagnosis**:
-1. Search for duplicate patterns across skills
-2. Identify which skill should own the knowledge
-3. Check if skills reference each other
-
-**Fix**:
-```markdown
-# coding-standards/SKILL.md (owns naming conventions)
-## Naming Conventions
-
-**Class Names**: PascalCase
-**Methods**: camelCase
-**Constants**: UPPER_SNAKE_CASE
-
-# logging-strategy/SKILL.md (references, doesn't duplicate)
-## Logger Naming
-
-Follow `coding-standards` skill naming conventions for logger names:
-```java
-private static final Logger LOGGER = LoggerFactory.getLogger(ClassName.class);
-```
-```
-
-### Issue: Skill Too Broad
-
-**Symptoms**: Skill covers many unrelated topics, hard to maintain
-
-**Diagnosis**:
-1. Count distinct knowledge domains in skill
-2. Check if skill name is generic (e.g., "development", "best-practices")
-3. See if different sections have different audiences
-
-**Fix**: Split into focused skills (see "When to Split a Skill")
-
-## Skill Creation Checklist
-
-When creating a new skill:
-
-- [ ] **Planning**
-  - [ ] Identified specific knowledge domain
-  - [ ] Checked for existing skills covering topic
-  - [ ] Determined appropriate category folder
-  - [ ] Verified skill won't exceed 400 lines
-
-- [ ] **Frontmatter**
-  - [ ] Unique `name` (lowercase-with-hyphens)
-  - [ ] Clear `description` (one line)
-  - [ ] Appropriate `category`
-  - [ ] Relevant `tags` for matching
-  - [ ] `allowed-tools` if skill uses tools
-
-- [ ] **Content Structure**
-  - [ ] Purpose section explains scope
-  - [ ] "When to Use" lists clear use cases
-  - [ ] Core patterns documented
-  - [ ] Best practices (DO/DON'T) included
-  - [ ] Quick reference section
-
-- [ ] **Examples**
-  - [ ] Code examples are correct and tested
-  - [ ] Shows both correct and incorrect patterns
-  - [ ] Explains reasoning ("Why")
-  - [ ] Large examples moved to `examples/`
-
-- [ ] **Integration**
-  - [ ] Related skills referenced
-  - [ ] Shows how skill works with others
-  - [ ] No duplicate content from other skills
-
-- [ ] **Documentation**
-  - [ ] Added to `.claude/CLAUDE.md` skills section
-  - [ ] Category documented
-  - [ ] Integration patterns explained
-
-- [ ] **Testing**
-  - [ ] Created sample agent/command that uses skill
-  - [ ] Mental walkthrough of common use cases
-  - [ ] Verified skill loads correctly
 
 ## Best Practices
 
-### ✅ DO
+### For SKILL.md Content
 
-- **Keep skills focused** on single knowledge domain
-- **Use clear frontmatter** with accurate description and tags
-- **Provide concrete examples** with code snippets
-- **Explain reasoning** with "Why" sections
-- **Reference other skills** instead of duplicating
-- **Keep SKILL.md concise** (<400 lines)
-- **Move details to examples/** for advanced patterns
-- **Update regularly** as patterns evolve
-- **Test mental walkthrough** of skill usage
+**✅ DO**:
+- Focus on essential patterns
+- Include anti-patterns (what NOT to do)
+- Reference examples instead of embedding
+- Keep under 400 lines
+- Use clear section headers
 
-### ❌ DON'T
+**❌ DON'T**:
+- Include every possible example
+- Duplicate content from other skills
+- Use vague descriptions
+- Forget frontmatter
 
-- **Create overly broad skills** covering many domains
-- **Duplicate knowledge** across multiple skills
-- **Use vague language** - be specific and actionable
-- **Exceed 400 lines** in SKILL.md (split instead)
-- **Forget frontmatter** - required for auto-loading
-- **Create skills for single use** - skills should be reusable
-- **Skip documentation** in CLAUDE.md
-- **Use "load" language** when referencing skills
+### For Frontmatter
 
-## Skill Maintenance
+**✅ DO**:
+- Use descriptive, searchable tags
+- Write clear one-line description
+- Match category to folder structure
+- Include relevant allowed-tools
 
-### When to Update a Skill
+**❌ DON'T**:
+- Use generic tags (e.g., "general")
+- Write multi-line descriptions
+- Mismatch category and folder
+- List tools skill doesn't use
 
-**Update when**:
-- New patterns discovered through research
-- Anti-patterns identified in code reviews
-- Framework/library updates change best practices
-- User feedback indicates confusion
-- Related skills change and affect this one
+### For Organization
 
-### Update Process
+**✅ DO**:
+- Group related skills in same category
+- Use consistent naming (kebab-case)
+- Create examples/ when needed
+- Document in CLAUDE.md
 
-1. **Identify what changed**
-   ```bash
-   # Find all files that might need updates
-   grep -r "old-pattern" .claude/skills/
-   ```
+**❌ DON'T**:
+- Mix categories (one skill, one category)
+- Use inconsistent naming
+- Embed all examples in SKILL.md
+- Skip CLAUDE.md documentation
 
-2. **Update skill content**
-   - Modify SKILL.md
-   - Update examples if needed
-   - Adjust related skills references
+---
 
-3. **Update documentation**
-   - Update `.claude/CLAUDE.md` if skill scope changed
-   - Update agent files if they reference the skill
+## Quality Checklist
 
-4. **Test integration**
-   - Mental walkthrough of agents using skill
-   - Verify no conflicts with other skills
-   - Check examples still work
+Before finalizing a skill:
 
-### Deprecating Skills
+- [ ] Frontmatter complete (name, description, category, tags)
+- [ ] SKILL.md under 400 lines
+- [ ] Clear purpose and scope
+- [ ] Examples referenced (not embedded if long)
+- [ ] No duplicate content from other skills
+- [ ] Documented in `.claude/CLAUDE.md`
+- [ ] Category folder matches frontmatter
+- [ ] Agents reference skill correctly (no "load" language)
 
-**When to deprecate**:
-- Knowledge is obsolete (old framework version)
-- Merged into another skill
-- Split into multiple focused skills
+---
 
-**Process**:
-1. Add deprecation notice to SKILL.md
-2. Reference replacement skill(s)
-3. Update agents/commands to use new skill
-4. After transition period, archive skill
+## Maintenance
 
-```markdown
-# DEPRECATED: old-skill
+### When to Split a Skill
 
-**This skill is deprecated. Use these instead**:
-- `new-skill-1` - Covers X
-- `new-skill-2` - Covers Y
+Split if:
+- Over 400 lines and can't condense
+- Covers multiple distinct domains
+- Has independent use cases
 
-[Original content for reference]
-```
+**Example**: Split `development-guide` into:
+- `coding-standards` (code style)
+- `testing-patterns` (testing)
+- `git-workflow` (version control)
 
-## Advanced Patterns
+### When to Merge Skills
 
-### Conditional Skill Application
+Merge if:
+- Multiple small skills on same topic
+- Heavily dependent on each other
+- Always used together
 
-**For skills with context-dependent patterns**:
+**Example**: Merge `naming-conventions` + `code-organization` → `coding-standards`
 
-```markdown
-## Pattern Selection
+### Updating Skills
 
-**For client-side code**:
-[Client-specific patterns]
+**When updating**:
+1. Keep frontmatter current
+2. Update CLAUDE.md if description changes
+3. Maintain backward compatibility
+4. Update references in agent prompts
 
-**For server-side code**:
-[Server-specific patterns]
+---
 
-**For shared code**:
-[Patterns that work everywhere]
-```
+## Examples
 
-### Skill Templates
+**See `examples/skill-patterns.md`** for:
+- Complete skill creation walkthrough
+- Before/after refactoring examples
+- Multi-file skill organization
+- Advanced integration patterns
 
-**For skills that provide templates**:
-
-```
-.claude/skills/process/epic-requirements/
-├── SKILL.md              # Guidelines for requirements
-└── template.md           # requirements.md template
-```
-
-**Reference in SKILL.md**:
-```markdown
-## Template Usage
-
-Use the template in `template.md` as a starting point.
-
-**Required Sections**:
-- Epic Overview
-- Features
-- Success Criteria
-```
-
-### Skill Versioning
-
-**For skills that evolve significantly**:
-
-```
-.claude/skills/minecraft/fabric-modding/
-├── SKILL.md              # Current version (Fabric 1.21.1)
-└── examples/
-    ├── migration-1.20-to-1.21.md
-    └── legacy-1.20-patterns.md
-```
-
-## Quality Standards
-
-### Content Quality
-
-- **Accurate**: All patterns tested and verified
-- **Current**: Reflects latest framework versions
-- **Complete**: Covers common use cases
-- **Clear**: Easy to understand and follow
-- **Concise**: No unnecessary information
-
-### Structural Quality
-
-- **Well-organized**: Logical flow of sections
-- **Consistent**: Follows skill template
-- **Scannable**: Clear headings and formatting
-- **Referenced**: Links to related skills and examples
-
-### Integration Quality
-
-- **Discoverable**: Tags and description match use cases
-- **Composable**: Works well with other skills
-- **Non-duplicate**: No overlap with existing skills
-- **Referenced**: Used by relevant agents/commands
+---
 
 ## References
 
-- Related skills: `claude-code-agents`, `claude-code-commands`, `claude-code-setup`
-- Documentation: `.claude/CLAUDE.md` (Skills System section)
-- Examples: See existing skills in `.claude/skills/`
-- Claude Code docs: https://docs.claude.com/en/docs/claude-code
+**Related Skills**:
+- **claude-code-setup** - Overall infrastructure
+- **claude-code-agents** - Agent patterns
+- **claude-code-commands** - Command patterns
+- **ai-workflow** - How skills integrate with workflows
+
+**Documentation**: `.claude/CLAUDE.md` - Complete skills list
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used claude-code-skills
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used claude-code-skills`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

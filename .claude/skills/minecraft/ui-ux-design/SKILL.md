@@ -702,3 +702,17 @@ Use this skill when:
 8. **Document Deviations** - Explain why implementation differs from mockup
 9. **User Testing** - Always test with user before finalizing
 10. **Mockup Accuracy** - Implement as close to mockup as possible
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used ui-ux-design
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used ui-ux-design`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

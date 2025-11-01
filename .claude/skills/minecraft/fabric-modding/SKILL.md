@@ -584,3 +584,17 @@ Use this skill when:
 - Questions about "How do I do X with Fabric API?"
 - Questions about "What's the Fabric way to implement Y?"
 - Debugging Fabric-specific issues (event timing, mixin conflicts)
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used fabric-modding
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used fabric-modding`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

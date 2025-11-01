@@ -37,7 +37,8 @@ allowed-tools: [Read, Write, Edit, Grep, Glob]
 
 ```
 .claude/knowledge/
-├── knowledge-index.json         # Master index (ALWAYS update)
+├── knowledge-index.json         # Master index with enhanced taxonomy (ALWAYS update)
+├── project-cache.json          # Pre-computed project→knowledge mappings
 ├── WRITING_STANDARDS.md        # Content standards (this skill summarizes it)
 ├── MIGRATION_GUIDE.md          # Migration procedures
 ├── README.md                   # Overview
@@ -48,6 +49,73 @@ allowed-tools: [Read, Write, Edit, Grep, Glob]
 ├── graphics/                  # Visual systems
 └── performance/               # Optimization knowledge
 ```
+
+### New: Enhanced Index Structure (v2.0)
+
+The knowledge-index.json now includes:
+
+**1. Metadata Section**: Version tracking, update timestamps, total entry count
+
+**2. Taxonomy Section**:
+- **Categories**: Formal category definitions (minecraft, fabric, library, graphics, performance)
+- **Tag Groups**: Organized tag collections for better discovery (entities, graphics, performance, fabric, libraries, systems)
+
+**3. Enhanced Entry Fields**:
+- **category**: Primary category (aligns with folder structure)
+- **relevance.projects**: Which projects benefit from this knowledge
+- **relevance.topics**: Semantic topic classifications
+- **relevance.difficulty**: Content complexity level (reference, intermediate, advanced)
+
+**Example Enhanced Entry**:
+```json
+{
+  "path": "minecraft/villagers.md",
+  "title": "Minecraft Villager System",
+  "category": "minecraft",
+  "tags": ["minecraft", "villagers", "professions", "textures", "ai"],
+  "date_updated": "2025-10-27",
+  "summary": "Complete documentation of villager system",
+  "related": ["fabric-api/registry.md"],
+  "relevance": {
+    "projects": ["xeena-village-manager"],
+    "topics": ["entities", "ai-systems", "vanilla-mechanics"],
+    "difficulty": "intermediate"
+  }
+}
+```
+
+### New: Project Knowledge Cache
+
+**File**: `.claude/knowledge/project-cache.json`
+
+**Purpose**: Pre-computed mappings of projects → relevant knowledge entries for instant context loading.
+
+**Structure**:
+```json
+{
+  "cache": {
+    "project-name": {
+      "description": "Project purpose",
+      "relevant_knowledge": [
+        {
+          "path": "category/file.md",
+          "priority": "critical|high|medium|low",
+          "reason": "Why this knowledge matters"
+        }
+      ],
+      "common_tags": ["tag1", "tag2", "tag3"]
+    }
+  }
+}
+```
+
+**Priority Levels**:
+- **critical**: Must read for any work on this project
+- **high**: Highly relevant, read for most tasks
+- **medium**: Useful reference, read when applicable
+- **low**: Background information, optional
+
+**Usage**: planning-agent reads this during `/next` command to automatically load relevant knowledge for tasks.
 
 ### Universal vs Project-Specific Decision Tree
 
@@ -270,8 +338,10 @@ See `.claude/knowledge/category/filename.md` for:
 **Your workflow with knowledge base**:
 
 1. **ALWAYS search knowledge base FIRST**:
-   - Read knowledge-index.json
-   - Search for relevant tags
+   - Read knowledge-index.json (now with enhanced taxonomy)
+   - Use category filter for faster search
+   - Search for relevant tags using tag_groups
+   - Check project-cache.json for project-relevant knowledge
    - Review existing knowledge
 
 2. **Identify gaps**: What's missing or unclear?
@@ -279,12 +349,14 @@ See `.claude/knowledge/category/filename.md` for:
 3. **Conduct research** only for gaps
 
 4. **Decide storage location**:
-   - Universal → `.claude/knowledge/` + update index
+   - Universal → `.claude/knowledge/` + update index + update project cache
    - Project-specific → `<project>/.claude/research/`
 
 5. **Follow WRITING_STANDARDS.md** for knowledge files
 
-6. **Update index** with proper tags
+6. **Update index** with proper tags and enhanced fields (category, relevance)
+
+7. **Update project cache** if knowledge is highly relevant to specific project
 
 ### For implementation-agent
 
@@ -294,6 +366,42 @@ See `.claude/knowledge/category/filename.md` for:
 2. **Reference knowledge files** in code comments when applicable
 3. **Suggest knowledge updates** if you discover gaps during implementation
 
+### For planning-agent
+
+**Your workflow with knowledge preloading**:
+
+1. **During /next command execution**:
+   - Read `.claude/knowledge/project-cache.json`
+   - Find active project's entry
+   - Load all "critical" and "high" priority knowledge paths
+
+2. **Task-specific knowledge matching**:
+   - Parse task description for keywords
+   - Search knowledge-index.json for matching tags
+   - Add task-specific knowledge to context
+
+3. **Pass knowledge context to worker agent**:
+   - Include list of relevant knowledge files
+   - Specify priority levels
+   - Explain why each is relevant
+
+**Example knowledge context passed to implementation-agent**:
+```
+## Relevant Knowledge Base Entries
+
+**Critical Priority**:
+- .claude/knowledge/libraries/porting-forge-to-fabric.md - Core porting guide
+- .claude/knowledge/minecraft/alexs-mobs-reference.md - Mob catalog
+
+**High Priority**:
+- .claude/knowledge/graphics/flying-entity-control.md - Flying entity patterns
+
+**Task-Specific** (matched tags: animations, geckolib):
+- .claude/knowledge/graphics/animations.md - Animation system guide
+
+Read these knowledge files BEFORE starting implementation.
+```
+
 ### For other agents
 
 **Your usage of knowledge base**:
@@ -301,6 +409,7 @@ See `.claude/knowledge/category/filename.md` for:
 1. **Search knowledge base** for unknown systems/APIs
 2. **Reference knowledge** instead of re-researching
 3. **Suggest updates** when finding outdated information
+4. **When receiving knowledge context from planning-agent**: Read referenced files first
 
 ---
 
@@ -342,6 +451,7 @@ See `.claude/knowledge/category/filename.md` for:
 4. Link to current knowledge
 5. Keep for historical reference
 6. Update index with deprecation note
+7. **Update project cache** to remove or mark deprecated entries
 
 **Example**:
 ```markdown
@@ -352,6 +462,46 @@ See `.claude/knowledge/category/filename.md` for:
 For Minecraft 1.19+, see `.claude/knowledge/fabric-api/registry.md`
 
 [old content preserved]
+```
+
+### Pattern: Updating Project Knowledge Cache
+
+**Scenario**: New knowledge added, project scope changes, or priority shifts.
+
+**Steps**:
+
+1. **Add new project** (when creating via /create_project):
+   ```json
+   "new-project-name": {
+     "description": "Project purpose from project.md",
+     "relevant_knowledge": [],
+     "common_tags": []
+   }
+   ```
+
+2. **Add knowledge entry** (when creating new universal knowledge):
+   - Determine which projects benefit from this knowledge
+   - Assign priority level (critical, high, medium, low)
+   - Add to relevant project entries with reason
+   - Update common_tags if introducing new tag
+
+3. **Update priorities** (as understanding improves):
+   - Review project progress and identify which knowledge was most valuable
+   - Adjust priority levels based on actual usage
+   - Remove entries that proved less relevant
+
+4. **Validate cache consistency**:
+   - Ensure all referenced knowledge paths exist in knowledge-index.json
+   - Check that project names match active projects
+   - Verify priority levels are appropriate
+
+**Example: Adding flying entity knowledge to alexs-mobs project**:
+```json
+{
+  "path": "graphics/flying-entity-control.md",
+  "priority": "high",
+  "reason": "Essential for implementing flying mobs (crows, eagles, etc.)"
+}
 ```
 
 ---
@@ -680,3 +830,17 @@ When splitting a knowledge file:
 - Migration Guide: `.claude/knowledge/MIGRATION_GUIDE.md`
 - Knowledge Base README: `.claude/knowledge/README.md`
 - Knowledge Index: `.claude/knowledge/knowledge-index.json`
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used knowledge-base-management
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used knowledge-base-management`
+
+This helps track which skills are actively consulted and identifies documentation gaps.

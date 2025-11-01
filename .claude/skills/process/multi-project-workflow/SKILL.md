@@ -208,3 +208,17 @@ User: /create_project "Project Name"
 5. **Skills-Based Knowledge** - Skills activated automatically
 6. **Agent Specialization** - Clear non-overlapping responsibilities
 7. **User Validation** - Manual testing before automated tests
+
+---
+
+## Usage Tracking
+
+**When using this skill**, append one line to `.claude/tracker/skill.md`:
+
+```
+[YYYY-MM-DD HH:MM:SS] [your-agent-name] used multi-project-workflow
+```
+
+**Example**: `[2025-11-01 15:30:00] implementation-agent used multi-project-workflow`
+
+This helps track which skills are actively consulted and identifies documentation gaps.
